@@ -4,7 +4,7 @@
 
 Expediente versionado de Actividad 4 enlazado con el diseño entregado en Actividad 3. El caso acordado con la Actividad 3 es `AssignCourierUseCase`: asignar mensajero a una entrega pendiente; verificar disponibilidad y capacidad de ruta; persistir estado y notificación durable.
 
-La carpeta `docs/activity-3/` conserva el material de referencia original recibido. Los requisitos del PDF orientan la entrega; el alcance concreto de dominio se obtiene de la Actividad 3 y las decisiones de implementación de los ADR de esta wiki.
+El [índice de Actividad 3](../docs/actividad-3.md) conserva el diseño, las reglas de dominio, escenarios BDD, ADR y presentación usados para decidir el slice.
 
 ## Páginas
 

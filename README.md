@@ -1,70 +1,83 @@
-# Actividad 4 — Asignación de mensajero (vertical slice)
+# Actividad 4: asignación de mensajero (vertical slice)
 
-Implementación de la Actividad 3: asignar un mensajero disponible a una entrega pendiente, verificando capacidad de ruta y registrando `DeliveryAssigned` de forma durable.
+[![CI](https://github.com/santy8151/actividad-4-arquitectura/actions/workflows/ci.yml/badge.svg)](https://github.com/santy8151/actividad-4-arquitectura/actions/workflows/ci.yml)
 
-## Navegación y trazabilidad
+Vertical slice basado en el flujo aprobado en Actividad 3: asignar un mensajero disponible a una entrega pendiente, verificar capacidad de ruta y guardar el evento `DeliveryAssigned` de forma durable.
 
-- [Tablero Kanban GitHub Projects](https://github.com/users/santy8151/projects/12) · [Issues](https://github.com/santy8151/actividad-4-arquitectura/issues)
-- [Wiki versionada](wiki/Home.md) · [Matriz de trazabilidad](wiki/Trazabilidad.md)
-- [ADRs](wiki/Decisiones-Arquitectonicas.md) · [Plan de pruebas](wiki/Plan-de-Pruebas.md)
-- [Riesgos y observabilidad](wiki/Riesgos-y-Observabilidad.md) · [Guion de defensa](wiki/Guion-de-Defensa.md)
-- [Diseño original Actividad 3](docs/activity-3/Architecture.md) · [modelo](docs/activity-3/docs/modelo-dominio.md) · [BDD](docs/activity-3/docs/escenarios-bdd.md)
+## Arquitectura Onion
+
+La dependencia siempre apunta hacia el dominio. Infraestructura implementa puertos de aplicación; la API compone los adaptadores al iniciar.
+
+```text
+                    ┌───────────────────────────────┐
+                    │ Exterior: API + Infrastructure│
+                    │       dependen hacia adentro  │
+                    │   ┌───────────────────────┐   │
+                    │   │ Application           │   │
+                    │   │ casos de uso + puertos│   │
+                    │   │   ┌───────────────┐   │   │
+                    │   │   │ Domain        │   │   │
+                    │   │   │ reglas/eventos│   │   │
+                    │   │   └───────────────┘   │   │
+                    │   └───────────────────────┘   │
+                    └───────────────────────────────┘
+```
+
+- `LastMile.Domain`: entidades, invariantes, value objects y eventos; no referencia otras capas.
+- `LastMile.Application`: casos de uso y puertos; referencia solo Domain.
+- `LastMile.Infrastructure`: EF Core, SQLite y adaptadores; implementa contratos de Application y referencia el núcleo.
+- `LastMile.Api`: HTTP/DTO y composition root; referencia Application e Infrastructure.
+
+La regla se verifica automáticamente con `python scripts/check_architecture.py` y en CI. No hay carpetas por cada clase: se agrupa por capa, y en Infrastructure por adaptador concreto.
+
+## Navegación
+
+- [Tablero Kanban](https://github.com/users/santy8151/projects/12) · [wiki y trazabilidad](wiki/Home.md)
+- [Diseño de Actividad 3](docs/actividad-3.md) · [ADRs](wiki/Decisiones-Arquitectonicas.md)
+- [Pruebas](wiki/Plan-de-Pruebas.md) · [riesgos/observabilidad](wiki/Riesgos-y-Observabilidad.md)
+- [Guion de defensa](wiki/Guion-de-Defensa.md) · [checklist](wiki/Checklist-de-Entrega.md)
 
 ## Requisitos
 
-- .NET SDK 10.0.x
-- Python 3 para ejecutar la fitness function
+.NET SDK 10.0.x y Python 3.
 
-## Ejecutar localmente
+## Ejecutar
 
 ```powershell
 dotnet restore LastMile.sln
-dotnet build LastMile.sln
 dotnet run --project src/LastMile.Api
 ```
 
-La primera ejecución aplica la migración SQLite y crea una entrega de demostración. La API escucha en la URL que informa ASP.NET Core. El mensajero demo disponible es `c0000000-0000-4000-8000-000000000001` y la entrega de ejemplo es `d1000000-0000-4000-8000-000000000001`.
+La primera ejecución aplica la migración SQLite y agrega la entrega demo. Repartidor: `c0000000-0000-4000-8000-000000000001`. Entrega: `d1000000-0000-4000-8000-000000000001`. API HTTP de ejemplo en `src/LastMile.Api/LastMile.Api.http`.
 
-```powershell
-Invoke-RestMethod http://localhost:5000/api/deliveries/d1000000-0000-4000-8000-000000000001/courier-assignment `
-  -Method Post -ContentType 'application/json' `
-  -Body '{"courierId":"c0000000-0000-4000-8000-000000000001"}'
-```
+Consulta `GET /api/deliveries/{deliveryId}`, salud `GET /health`; asigna con `POST /api/deliveries/{deliveryId}/courier-assignment`. La entrega solo se asigna una vez; elimina `lastmile.db` con la API detenida para reiniciar la demostración.
 
-La URL de ejemplo debe cambiarse por la URL HTTP/HTTPS anunciada en la consola (`launchSettings.json` suele usar otro puerto). Para inspeccionar la entrega: `GET /api/deliveries/{deliveryId}`; para salud de persistencia: `GET /health`. La entrega queda asignada una sola vez, por lo que reinicia SQLite (`lastmile.db`) o usa otro ID para repetir la demo de éxito.
-
-### Probar
+## Verificar
 
 ```powershell
 python scripts/check_architecture.py
-dotnet test LastMile.sln
+dotnet build LastMile.sln --configuration Release
+dotnet test LastMile.sln --configuration Release
 ```
 
-Las pruebas unitarias cubren invariantes de dominio. Las pruebas de integración atraviesan la API y SQLite en memoria, verifican persistencia/outbox y aseguran que una ruta llena produce conflicto sin efectos laterales.
+CI además ejecuta `dotnet ef migrations has-pending-model-changes` y `dotnet list package --vulnerable --include-transitive`. Evidencia: [última ejecución verde](https://github.com/santy8151/actividad-4-arquitectura/actions/runs/38127220532).
 
-## Arquitectura
-
-`Domain` no conoce infraestructura; `Application` depende solo de `Domain`; `Infrastructure` implementa los puertos de aplicación; `Api` compone el sistema. El flujo guarda la entrega y evento en la misma transacción SQLite mediante outbox. La versión de entrega actúa como token de concurrencia.
+## Estructura
 
 ```text
-HTTP → API/DTO → AssignCourierUseCase → Delivery (invariante)
-                    ├─ ICourierAvailability → demo o adaptador HTTP
-                    ├─ IRouteCapacity       → demo o adaptador HTTP
-                    └─ IDeliveryRepository + IAssignmentEvents → EF Core/SQLite + outbox
+src/
+  LastMile.Domain/          # Centro de Onion
+  LastMile.Application/     # Casos de uso y puertos
+  LastMile.Infrastructure/  # Adaptadores y persistencia
+  LastMile.Api/             # Entrada HTTP y composition root
+tests/                      # Dominio e integración
+docs/                       # Diseño de Actividad 3 y ADR original
+wiki/                       # Trazabilidad, decisiones, riesgos y defensa
+scripts/                    # Fitness function arquitectónica
 ```
 
-Migración reproducible: `src/LastMile.Infrastructure/Persistence/Migrations/20261011000000_InitialCreate.cs`; la API llama `Database.Migrate()` al iniciar. La configuración de producción conecta adaptadores HTTP mediante `Integration:CourierManagement:BaseUrl`, `Integration:RoutePlanning:BaseUrl` y `Integration:RouteEvents:BaseUrl` (variables `Integration__...__BaseUrl`). Vacíos usan adaptadores demo; no usar esos defaults para producción.
+## Adaptadores y riesgos
 
-Los GET de integraciones externas reintentan fallos de transporte/5xx/429 hasta tres veces. Un evento fallido queda en outbox y se reintenta con espera exponencial hasta cinco intentos, luego queda en dead-letter para revisión. No hay credenciales ni secretos de servicios externos en el repositorio.
+Las integraciones HTTP se configuran con `Integration:CourierManagement:BaseUrl`, `Integration:RoutePlanning:BaseUrl` y `Integration:RouteEvents:BaseUrl`; valores vacíos usan doubles demo. Las consultas reintentan red/429/5xx hasta tres veces. La entrega y el evento se guardan en una transacción; un worker publica el outbox con idempotency key, backoff y dead-letter tras cinco intentos.
 
-## Límites y riesgos conocidos
-
-- La consulta de capacidad no reserva cupo atómicamente; dos asignaciones concurrentes podrían exceder capacidad en el sistema de rutas. En producción el servicio de rutas debe ofrecer reserva idempotente o contrato de saga.
-- API de demostración sin autenticación/autorización: solo local, agregar identidad y autorización antes de exponer.
-- La muestra usa SQLite local; elegir motor administrado, backup y alta disponibilidad según despliegue.
-- Se emiten métricas .NET y actividades, pero no se configura exporter; agregar OpenTelemetry/exporter para despliegue y alertas.
-- La comprobación SAST/dependencias se ejecuta en CI; integrar DAST contra entorno desplegado antes de publicar.
-
-Consulta [riesgos, mitigaciones y evidencia](wiki/Riesgos-y-Observabilidad.md) y [registro de ejecución](wiki/Registro-de-Ejecucion.md). Nunca registrar direcciones ni credenciales.
-
-- [Checklist de entrega](wiki/Checklist-de-Entrega.md)
+SQLite y doubles permiten ejecutar la demo local. La capacidad se consulta, no se reserva atómicamente; falta reserva idempotente o saga para resolver la carrera entre solicitudes. La API no tiene autenticación y la telemetría no exporta a un collector; son límites documentados para esta demostración, no configuración de producción.

@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\LastMile.Application\LastMile.Application.csproj" />
     <ProjectReference Include="..\LastMile.Infrastructure\LastMile.Infrastructure.csproj" />
+    <ProjectReference Include="..\LastMile.Domain\LastMile.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

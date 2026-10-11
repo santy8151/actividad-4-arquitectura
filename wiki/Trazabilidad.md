@@ -15,6 +15,6 @@
 | REQ-11 | Defensa de 10–15 min | flujo implementado | guion 12 min | grabación/cronómetro pendientes | En curso |
 | REQ-12 | Repositorio ejecutable | N/A | solución, README, migración y CI | Release build: 0 errores/0 advertencias | Verificado |
 | REQ-13 | Enlace del video | N/A | entrega | URL pública pendiente | Pendiente |
-| REQ-14 | Expediente actualizado con diseño previo | A3 adjunta en `docs/activity-3/` | wiki, diagramas, ADR y trazas | enlaces navegables | Implementado |
+| REQ-14 | Expediente actualizado con diseño previo | diseño A3 en `docs/actividad-3.md` | wiki, diagramas, ADR y trazas | enlaces navegables | Implementado |
 
-Los issues del proyecto GitHub identifican `KAN-XX` y sus requisitos. No marcar CI/integraciones como verificadas sin salida real del workflow. El diseño de A3 está disponible en `docs/activity-3/`.
+Los issues del proyecto GitHub identifican `KAN-XX` y sus requisitos. No marcar CI/integraciones como verificadas sin salida real del workflow. El diseño de A3 está disponible en [`docs/actividad-3.md`](../docs/actividad-3.md).

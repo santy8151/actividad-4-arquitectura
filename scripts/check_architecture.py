@@ -9,11 +9,12 @@ projects = {
     "Infrastructure": root / "src/LastMile.Infrastructure/LastMile.Infrastructure.csproj",
     "Api": root / "src/LastMile.Api/LastMile.Api.csproj",
 }
-allowed = {
+# Exact project graph for the Onion: all runtime dependencies point inward.
+expected = {
     "Domain": set(),
     "Application": {"Domain"},
     "Infrastructure": {"Application", "Domain"},
-    "Api": {"Application", "Domain", "Infrastructure"},
+    "Api": {"Application", "Infrastructure", "Domain"},  # Outer composition and HTTP layer
 }
 failed = False
 for layer, project in projects.items():
@@ -24,12 +25,15 @@ for layer, project in projects.items():
         target = target.removeprefix("LastMile.")
         if target in projects:
             actual.add(target)
-    invalid = actual - allowed[layer]
-    print(f"{layer}: references={sorted(actual)} allowed={sorted(allowed[layer])}")
-    if invalid:
+    print(f"{layer}: references={sorted(actual)}")
+    if actual != expected[layer]:
         failed = True
-        if invalid:
-            print(f"  ERROR: references to forbidden layer(s): {sorted(invalid)}")
+        forbidden = actual - expected[layer]
+        missing = expected[layer] - actual
+        if forbidden:
+            print(f"  ERROR: forbidden outward reference(s): {sorted(forbidden)}")
+        if missing:
+            print(f"  ERROR: expected inner-layer reference(s) missing: {sorted(missing)}")
 if failed:
     sys.exit(1)
-print("Architecture fitness function passed.")
+print("Onion architecture fitness function passed.")

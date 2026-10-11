@@ -9,7 +9,7 @@
 
 ## Correspondencia con Actividad 3
 
-- [x] Material original de Actividad 3 incluido en `docs/activity-3/`.
+- [x] Referencias útiles de Actividad 3 organizadas en [`docs/actividad-3.md`](../docs/actividad-3.md); se eliminó el prototipo duplicado.
 - [x] Flujo implementado conserva el caso `AssignCourierUseCase` y reglas documentadas.
 - [x] Decisiones añadidas están en ADR con trade-offs y residuales.
 - [x] Matriz REQ ↔ A3 ↔ código ↔ pruebas ↔ evidencia.
