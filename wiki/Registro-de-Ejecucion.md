@@ -4,7 +4,7 @@ Registrar verificaciones reales con fecha, commit, entorno, comando, resultado, 
 
 | Fecha | Commit | REQ | Entorno/comando | Resultado | Evidencia/observaciones |
 |---|---|---|---|---|---|
-| 2026-10-11 | Inicial | REQ-05, REQ-12 | Inspección de estructura Markdown | Wiki, matriz y Kanban iniciales creados; aplicación y pruebas pendientes | Caso de uso/stack esperan Actividad 3 |
+| 2026-10-11 | `5fdf9e0` + docs de tablero | REQ-05, REQ-12 | `gh project view 12`; revisión de issues y vista; `git status` | Repositorio privado publicado; wiki Markdown versionada; GitHub Projects privado vinculado con vista `BOARD_LAYOUT` y 12 issues que incluyen `KAN-XX`, `REQ-XX` y criterios. Sin aplicación ni pruebas todavía. | [Repositorio](https://github.com/santy8151/actividad-4-arquitectura) · [Kanban](https://github.com/users/santy8151/projects/12) |
 
 ## Riesgos residuales y próximos pasos
 

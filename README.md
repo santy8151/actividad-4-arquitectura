@@ -6,6 +6,7 @@ Repositorio para construir, validar y defender un vertical slice ejecutable, con
 
 ## Navegación
 
+- [Tablero Kanban en GitHub Projects](https://github.com/users/santy8151/projects/12)
 - [Wiki del proyecto](wiki/Home.md)
 - [Trazabilidad](wiki/Trazabilidad.md)
 - [Tablero Kanban](wiki/Tablero-Kanban.md)
@@ -19,7 +20,8 @@ Repositorio para construir, validar y defender un vertical slice ejecutable, con
 
 - Caso de uso vertical: pendiente de confirmar contra la Actividad 3.
 - Stack y persistencia: pendientes de confirmar.
-- Wiki y Kanban: inicializados como Markdown versionado.
+- Kanban: proyecto privado de GitHub con vista de tablero, vinculado al repositorio y 12 issues trazables.
+- Wiki: expediente Markdown versionado en `wiki/`; GitHub Wiki está habilitada en la configuración del repositorio.
 
 ## Inicio rápido
 

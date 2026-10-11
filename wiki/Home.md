@@ -10,6 +10,7 @@ El caso de uso y los artefactos de Actividad 3 aún deben ser aportados. No cerr
 
 ## Páginas
 
+- [Tablero Kanban de GitHub Projects](https://github.com/users/santy8151/projects/12)
 - [Trazabilidad](Trazabilidad.md)
 - [Tablero Kanban](Tablero-Kanban.md)
 - [Decisiones arquitectónicas](Decisiones-Arquitectonicas.md)

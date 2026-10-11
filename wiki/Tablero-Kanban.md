@@ -2,20 +2,24 @@
 
 Mover las tarjetas entre columnas y mantener el ID `REQ-XX`. Límite sugerido: máximo dos tarjetas en curso.
 
+## Tablero en GitHub Projects
+
+El tablero operativo está en [Actividad 4 | Vertical Slice, Calidad y Defensa](https://github.com/users/santy8151/projects/12). Está vinculado a este repositorio y usa issues con criterios de aceptación como tarjetas. Este archivo mantiene la vista espejo versionada para que el plan siga disponible junto al expediente.
+
 ## Pendiente
 
-- [ ] **KAN-01 / REQ-01** Recibir diseño/artefactos de Actividad 3; confirmar dominio, flujo, invariantes y límites.
-- [ ] **KAN-02 / REQ-01** Elegir el slice y criterios de aceptación/casos límite.
-- [ ] **KAN-03 / REQ-02** Confirmar lenguaje, framework, base de datos e integraciones.
-- [ ] **KAN-04 / REQ-05, REQ-14** Contrastar con Actividad 2/3 y registrar ADRs/ajustes.
-- [ ] **KAN-05 / REQ-01..03** Implementar flujo vertical y adaptadores necesarios.
-- [ ] **KAN-06 / REQ-04** Añadir migraciones si cambia el esquema.
-- [ ] **KAN-07 / REQ-06** Añadir pruebas unitarias y prueba de integración de éxito/error.
-- [ ] **KAN-08 / REQ-07..09** Incorporar mitigaciones, observabilidad y fitness function.
-- [ ] **KAN-09 / REQ-10** Registrar resultados, riesgos residuales y próximos pasos.
-- [ ] **KAN-10 / REQ-12** Completar README con instalación, configuración, ejecución y verificación.
-- [ ] **KAN-11 / REQ-11, REQ-13** Grabar defensa (10-15 min), publicar y verificar enlace/permisos.
-- [ ] **KAN-12 / REQ-14** Actualizar expediente con diagramas y trazabilidad final.
+- [ ] **KAN-01 / REQ-01, REQ-05, REQ-14** [Confirmar diseño de Actividad 3](https://github.com/santy8151/actividad-4-arquitectura/issues/1).
+- [ ] **KAN-02 / REQ-01, REQ-02** [Definir el slice y criterios de aceptación](https://github.com/santy8151/actividad-4-arquitectura/issues/2).
+- [ ] **KAN-03 / REQ-02..04** [Confirmar stack, entorno y dependencias](https://github.com/santy8151/actividad-4-arquitectura/issues/3).
+- [ ] **KAN-04 / REQ-05, REQ-14** [Registrar ADRs y límites arquitectónicos](https://github.com/santy8151/actividad-4-arquitectura/issues/4).
+- [ ] **KAN-05 / REQ-01..03** [Implementar el vertical slice](https://github.com/santy8151/actividad-4-arquitectura/issues/5).
+- [ ] **KAN-06 / REQ-04** [Añadir migraciones reproducibles si aplica](https://github.com/santy8151/actividad-4-arquitectura/issues/6).
+- [ ] **KAN-07 / REQ-06** [Implementar pruebas unitarias e integración](https://github.com/santy8151/actividad-4-arquitectura/issues/7).
+- [ ] **KAN-08 / REQ-07, REQ-08** [Documentar riesgos y observabilidad](https://github.com/santy8151/actividad-4-arquitectura/issues/8).
+- [ ] **KAN-09 / REQ-09, REQ-10** [Añadir fitness function y registrar resultados](https://github.com/santy8151/actividad-4-arquitectura/issues/9).
+- [ ] **KAN-10 / REQ-12** [Completar README de ejecución](https://github.com/santy8151/actividad-4-arquitectura/issues/10).
+- [ ] **KAN-11 / REQ-11, REQ-13** [Preparar y publicar defensa final](https://github.com/santy8151/actividad-4-arquitectura/issues/11).
+- [ ] **KAN-12 / REQ-10, REQ-12, REQ-14** [Cerrar expediente y checklist](https://github.com/santy8151/actividad-4-arquitectura/issues/12).
 
 ## En curso
 
