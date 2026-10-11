@@ -1,13 +1,22 @@
 # Plan de pruebas
 
-Completar al confirmar caso de uso e invariantes de Actividad 3.
-
-| Nivel | Objetivo | Casos mínimos | Evidencia |
+| Nivel | Caso | Aserciones | Evidencia |
 |---|---|---|---|
-| Unitario de dominio | Probar invariantes sin infraestructura | Regla válida; rechazo de valor/transición inválida; límite relevante | Comando y salida en registro |
-| Aplicación | Probar orquestación y contratos | Éxito; puerto devuelve error controlado; estado inválido no se persiste | Pendiente |
-| Integración | Probar entrada → caso de uso → adaptador/persistencia | Camino feliz; error/límite; inspección del estado persistido | Pendiente |
-| Arquitectura/calidad | Prevenir dependencias que rompen límites | Dominio no importa infraestructura; análisis pertinente | Pendiente |
-| Seguridad | Comprobar riesgos del stack | SAST/dependency scan; DAST si hay endpoint desplegable | Pendiente |
+| Dominio unitario | asignación válida | courier asignado, estado Assigned, versión incrementa | `AssignCourier_ChangesCourierAndStatus` |
+| Dominio unitario | re-asignación | excepción `DeliveryAlreadyAssigned`; original/version preservados | `AssignCourier_WhenAlreadyAssigned...` |
+| Dominio unitario | courier vacío | error `InvalidCourierId`; estado pending | `AssignCourier_WhenCourierIdIsEmpty...` |
+| Integración éxito | POST API + EF + SQLite memoria | 200; DB Assigned; outbox pendiente en misma transacción | `AssignCourier_HappyPath_PersistsDeliveryAndOutboxEvent` |
+| Integración error | ruta llena | 409; DB sigue Pending; outbox vacío | `AssignCourier_WhenRouteIsFull_ReturnsConflictAndLeavesNoSideEffects` |
+| Arquitectura | dependencias de proyectos | Domain sin refs, Application solo Domain, Infrastructure hacia núcleo | `python scripts/check_architecture.py` |
+| Build/dependencias | Release, reporte de vulnerabilidades | compila; vulnerabilidades reportadas | GitHub Actions |
 
-No reportar pruebas como ejecutadas si aún no existen. Indicar si la integración usa servicios reales, contenedores o doubles controlados.
+## Comandos reproducibles
+
+```powershell
+python scripts/check_architecture.py
+dotnet build LastMile.sln --configuration Release
+dotnet test LastMile.sln --configuration Release
+dotnet list LastMile.sln package --vulnerable --include-transitive
+```
+
+La suite integra HTTP TestServer con SQLite real en memoria y doubles de courier/ruta. No afirmar prueba contra proveedores externos. En esta máquina Windows, la ejecución de integración fue bloqueada por Application Control (`0x800711C7`) al cargar la DLL en WebApplicationFactory; la misma suite está incluida para runner hospedado Linux de Actions.

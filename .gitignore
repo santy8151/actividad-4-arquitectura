@@ -1,14 +1,21 @@
+# .NET build outputs
+**/bin/
+**/obj/
+*.user
+*.suo
+*.db
+*.db-shm
+*.db-wal
+
+# Local secrets and tooling
 .env
 .env.*
 !.env.example
 secrets/
-*.log
-coverage/
-dist/
-build/
-node_modules/
+work/
 __pycache__/
 .venv/
-venv/
-.idea/
+
+# IDE
 .vscode/
+.idea/

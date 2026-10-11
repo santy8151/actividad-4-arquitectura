@@ -1,27 +1,20 @@
 # Matriz de trazabilidad
 
-Une cada exigencia de Actividad 4 con el diseño previo, el componente implementado, su verificación y evidencia. Las referencias de Actividad 3 quedan pendientes hasta recibir ese material.
+| REQ | Exigencia | Actividad 3 de origen | Implementación | Verificación/evidencia | Estado |
+|---|---|---|---|---|---|
+| REQ-01 | Vertical slice funcional | `AssignCourierUseCase`, asignar mensajero | `Program.cs`, `AssignCourierUseCase`, `Delivery` | Integración `AssignCourier_HappyPath_PersistsDeliveryAndOutboxEvent` | Implementado; integración pendiente CI |
+| REQ-02 | Capas y contratos | ADR-001/prototipo de A3 | Domain; Application ports; Infrastructure adapters | Fitness function arquitectónica | Verificado local |
+| REQ-03 | Integraciones y errores controlados | disponibilidad, capacidad y evento | HTTP/demo adapters, reintentos, outbox | Error por ruta llena; 503 integración caída | Implementado |
+| REQ-04 | Migración reproducible | persistencia entrega/evento | `20261011000000_InitialCreate`, `Database.Migrate()` | Build Release; integración desde DB vacía pendiente CI | Implementado |
+| REQ-05 | Trazabilidad de cambios | artefactos de A3 importados | ADR, wiki, Issues `KAN-XX` | historial Git y [Kanban](https://github.com/users/santy8151/projects/12) | En curso |
+| REQ-06 | Unitarias e integración (éxito/error) | invariantes de entrega y BDD | `DeliveryTests`, `AssignmentApiTests` | unitarias 3/3; integración impedida localmente por App Control, CI pendiente | En curso |
+| REQ-07 | Riesgos y seguridad | límites de contexto A3 | matriz de riesgos y CI | revisión documental; scan CI pendiente | En curso |
+| REQ-08 | Señales sin datos sensibles | observabilidad de asignación | logs estructurados, métricas, ActivitySource | inspección de campos; exporter pendiente | Implementado con residual |
+| REQ-09 | Fitness function | dominio como centro | `scripts/check_architecture.py` | comando pasa localmente | Verificado local |
+| REQ-10 | Trade-offs y riesgo residual | consulta de capacidad A3 | ADR-002 y matriz de riesgos | revisión arquitectónica | Documentado |
+| REQ-11 | Defensa de 10–15 min | flujo implementado | guion 12 min | grabación/cronómetro pendientes | En curso |
+| REQ-12 | Repositorio ejecutable | N/A | solución, README, migración y CI | Release build: 0 errores/0 advertencias | Verificado |
+| REQ-13 | Enlace del video | N/A | entrega | URL pública pendiente | Pendiente |
+| REQ-14 | Expediente actualizado con diseño previo | A3 adjunta en `docs/activity-3/` | wiki, diagramas, ADR y trazas | enlaces navegables | Implementado |
 
-| ID | Requisito | Actividad 3 | Artefacto/componente | Verificación | Evidencia | Estado |
-|---|---|---|---|---|---|---|
-| REQ-01 | Implementar flujo principal como vertical slice | Pendiente | Slice a definir | Ejecución extremo a extremo | Pendiente | Por definir |
-| REQ-02 | Conectar entrada, aplicación, dominio y persistencia por contratos | Pendiente | Capas y puertos | Revisión de dependencias + integración | Pendiente | Por definir |
-| REQ-03 | Adaptadores externos y controles pertinentes, si aplican | Pendiente | Adaptadores | Simular indisponibilidad/reintento/fallo | Pendiente | Por definir |
-| REQ-04 | Migraciones reproducibles si cambia el esquema | Pendiente | Migraciones | Aplicar desde base limpia | Pendiente | Condicional |
-| REQ-05 | Historial de cambios y ajustes al diseño documentados | Diseño pendiente | ADRs + commits | Revisar ADR y log | [Project/Issues](https://github.com/users/santy8151/projects/12) | En curso |
-| REQ-06 | Pruebas unitarias de invariantes e integración | Invariantes pendientes | Suite de pruebas | Suite con caso de error/límite | Pendiente | Por definir |
-| REQ-07 | Riesgos de operación y seguridad, mitigaciones y evidencia | Pendiente | Riesgos | Escaneo/control aplicable | Pendiente | En curso |
-| REQ-08 | Observabilidad diagnóstica sin exponer datos sensibles | Pendiente | Logs, métricas, trazas | Inspección de telemetría | Pendiente | En curso |
-| REQ-09 | Calidad/arquitectura automatizada y resultados | Pendiente | Fitness function/CI | Ejecución local/CI | Pendiente | Por definir |
-| REQ-10 | Riesgos residuales y próximos pasos | Pendiente | Riesgos + registro | Revisión al cierre | Pendiente | En curso |
-| REQ-11 | Defensa final de 10-15 minutos | Slice y ADRs finales | Guion + video | Duración/cobertura | Enlace pendiente | Por definir |
-| REQ-12 | Repositorio ejecutable con README e historial | N/A | Este repo | Clonar y seguir README | [GitHub](https://github.com/santy8151/actividad-4-arquitectura) | En curso |
-| REQ-13 | Enlace al video; no adjuntar archivo | N/A | Entrega | Abrir enlace con permisos | Enlace pendiente | Por definir |
-| REQ-14 | Expediente actualizado con diagramas y decisiones previas | Actividad 2/3 pendientes | Wiki y diagramas | Revisar consistencia y enlaces | Pendiente | Por definir |
-
-## Reglas
-
-- Estados: `Pendiente`, `En curso`, `Verificado`, `Bloqueado`.
-- Enlazar issue/PR/commit en artefacto o evidencia.
-- No marcar `Verificado` sin un comando o evidencia reproducible.
-- Mantener vínculos entre requisito, ADR, componente, prueba y evidencia de defensa.
+Los issues del proyecto GitHub identifican `KAN-XX` y sus requisitos. No marcar CI/integraciones como verificadas sin salida real del workflow. El diseño de A3 está disponible en `docs/activity-3/`.

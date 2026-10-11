@@ -1,27 +1,27 @@
 # Wiki del proyecto
 
-## Propósito
+## Propósito y fuente
 
-Expediente vivo de la Actividad 4: traza requisitos, diseño de la Actividad 3, implementación, pruebas, riesgos y defensa.
+Expediente versionado de Actividad 4 enlazado con el diseño entregado en Actividad 3. El caso acordado con la Actividad 3 es `AssignCourierUseCase`: asignar mensajero a una entrega pendiente; verificar disponibilidad y capacidad de ruta; persistir estado y notificación durable.
 
-## Estado
-
-El caso de uso y los artefactos de Actividad 3 aún deben ser aportados. No cerrar decisiones de dominio ni stack hasta revisarlos.
+La carpeta `docs/activity-3/` conserva el material de referencia original recibido. Los requisitos del PDF orientan la entrega; el alcance concreto de dominio se obtiene de la Actividad 3 y las decisiones de implementación de los ADR de esta wiki.
 
 ## Páginas
 
-- [Tablero Kanban de GitHub Projects](https://github.com/users/santy8151/projects/12)
-- [Trazabilidad](Trazabilidad.md)
-- [Tablero Kanban](Tablero-Kanban.md)
+- [Tablero Kanban operativo](https://github.com/users/santy8151/projects/12) · [espejo versionado](Tablero-Kanban.md)
+- [Matriz de trazabilidad](Trazabilidad.md)
 - [Decisiones arquitectónicas](Decisiones-Arquitectonicas.md)
 - [Plan de pruebas](Plan-de-Pruebas.md)
 - [Riesgos y observabilidad](Riesgos-y-Observabilidad.md)
 - [Guion de defensa](Guion-de-Defensa.md)
 - [Registro de ejecución](Registro-de-Ejecucion.md)
 
-## Flujo de actualización
+## Protocolo de actualización
 
-1. Actualizar el Kanban al iniciar y terminar trabajo.
-2. Referenciar `REQ-XX` en tareas, commits, pruebas y evidencia.
-3. Registrar decisiones que alteren Actividad 3 con contexto y consecuencias.
-4. Registrar comando, resultado y enlace/archivo de evidencia en el registro.
+1. Cada tarjeta debe referenciar `KAN-XX` y `REQ-XX`.
+2. Al cerrar una tarjeta, sincronizar su issue, el tablero, la matriz y la evidencia.
+3. Una decisión que concreta o altera el diseño previo requiere ADR con contexto, trade-off y riesgo residual.
+4. Registrar comandos/resultados reales con fecha y commit. Resultado CI pendiente no se reporta como éxito.
+5. El video final y su URL pública autorizada son una tarea de entrega separada.
+
+- [Checklist final](Checklist-de-Entrega.md)

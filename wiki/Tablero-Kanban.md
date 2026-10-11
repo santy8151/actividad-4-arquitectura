@@ -1,40 +1,31 @@
-# Tablero Kanban
+# Estado por columna
 
-Mover las tarjetas entre columnas y mantener el ID `REQ-XX`. Límite sugerido: máximo dos tarjetas en curso.
+Tablero operativo: [GitHub Projects](https://github.com/users/santy8151/projects/12). Issues enlazan cada tarjeta con su requisito y artefactos. Actualizar los dos estados al terminar cada cambio.
 
-## Tablero en GitHub Projects
+## Todo
 
-El tablero operativo está en [Actividad 4 | Vertical Slice, Calidad y Defensa](https://github.com/users/santy8151/projects/12). Está vinculado a este repositorio y usa issues con criterios de aceptación como tarjetas. Este archivo mantiene la vista espejo versionada para que el plan siga disponible junto al expediente.
+- [ ] KAN-11 / REQ-11, REQ-13: grabar, cronometrar y publicar la defensa; falta URL del video.
+- [ ] KAN-12 / REQ-10, REQ-12, REQ-14: checklist final, verificar acceso externo y cierre del expediente.
 
-## Pendiente
+## En curso / validación
 
-- [ ] **KAN-01 / REQ-01, REQ-05, REQ-14** [Confirmar diseño de Actividad 3](https://github.com/santy8151/actividad-4-arquitectura/issues/1).
-- [ ] **KAN-02 / REQ-01, REQ-02** [Definir el slice y criterios de aceptación](https://github.com/santy8151/actividad-4-arquitectura/issues/2).
-- [ ] **KAN-03 / REQ-02..04** [Confirmar stack, entorno y dependencias](https://github.com/santy8151/actividad-4-arquitectura/issues/3).
-- [ ] **KAN-04 / REQ-05, REQ-14** [Registrar ADRs y límites arquitectónicos](https://github.com/santy8151/actividad-4-arquitectura/issues/4).
-- [ ] **KAN-05 / REQ-01..03** [Implementar el vertical slice](https://github.com/santy8151/actividad-4-arquitectura/issues/5).
-- [ ] **KAN-06 / REQ-04** [Añadir migraciones reproducibles si aplica](https://github.com/santy8151/actividad-4-arquitectura/issues/6).
-- [ ] **KAN-07 / REQ-06** [Implementar pruebas unitarias e integración](https://github.com/santy8151/actividad-4-arquitectura/issues/7).
-- [ ] **KAN-08 / REQ-07, REQ-08** [Documentar riesgos y observabilidad](https://github.com/santy8151/actividad-4-arquitectura/issues/8).
-- [ ] **KAN-09 / REQ-09, REQ-10** [Añadir fitness function y registrar resultados](https://github.com/santy8151/actividad-4-arquitectura/issues/9).
-- [ ] **KAN-10 / REQ-12** [Completar README de ejecución](https://github.com/santy8151/actividad-4-arquitectura/issues/10).
-- [ ] **KAN-11 / REQ-11, REQ-13** [Preparar y publicar defensa final](https://github.com/santy8151/actividad-4-arquitectura/issues/11).
-- [ ] **KAN-12 / REQ-10, REQ-12, REQ-14** [Cerrar expediente y checklist](https://github.com/santy8151/actividad-4-arquitectura/issues/12).
-
-## En curso
-
-- [ ] **KAN-00 / REQ-05, REQ-07, REQ-08** Preparar wiki y trazabilidad inicial.
-
-## En revisión
-
-- (vacío)
+- [ ] KAN-07 / REQ-06: suite implementada; unitarias pasan localmente, pero las integraciones están impedidas en esta máquina por Windows Application Control al cargar DLL recién compiladas. Esperar workflow alojado de GitHub Actions.
+- [ ] KAN-09 / REQ-09: fitness function pasa localmente; workflow CI aún debe ejecutarse tras push.
+- [ ] KAN-08 / REQ-07, REQ-08: controles y límites documentados; escaneo SAST/dependencias de CI y exporter de métricas por verificar.
 
 ## Hecho
 
-- [x] Crear estructura inicial del repo, wiki, matriz de trazabilidad y tablero Kanban.
+- [x] KAN-01 / REQ-01, REQ-05, REQ-14: integrar diseño y materiales de Actividad 3 en el repositorio.
+- [x] KAN-02 / REQ-01, REQ-02: definir el slice y criterios de aceptación.
+- [x] KAN-03 / REQ-02..04: stack .NET 10, SQLite y configuraciones de adaptadores establecidos.
+- [x] KAN-04 / REQ-05, REQ-14: ADRs y límites documentados.
+- [x] KAN-05 / REQ-01..03: implementación API, caso de uso, dominio, adaptadores y outbox.
+- [x] KAN-06 / REQ-04: migración versionada integrada a arranque.
+- [x] KAN-10 / REQ-12: README de instalación, demo, pruebas y limitaciones.
+- [x] KAN-00 / REQ-05, REQ-07, REQ-08: expediente Markdown y trazabilidad.
 
 ## Definition of Done
 
-- Criterios de aceptación satisfechos y vinculados a `REQ-XX`.
-- Pruebas ejecutadas y resultado agregado a `Registro-de-Ejecucion.md`.
-- Evidencia, limitaciones y documentos relevantes actualizados.
+- Criterios enlazados con requisitos de la matriz.
+- Pruebas ejecutadas donde el entorno lo permita; el bloqueo del entorno queda evidenciado, CI pendiente.
+- No cerrar REQ de defensa/video hasta contar con grabación accesible.

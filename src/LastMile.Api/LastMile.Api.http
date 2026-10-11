@@ -1,0 +1,16 @@
+@baseUrl = http://localhost:5261
+@deliveryId = d1000000-0000-4000-8000-000000000001
+@courierId = c0000000-0000-4000-8000-000000000001
+
+GET {{baseUrl}}/health
+
+### Inspect delivery
+GET {{baseUrl}}/api/deliveries/{{deliveryId}}
+
+### Assign courier (the demo delivery can be assigned once)
+POST {{baseUrl}}/api/deliveries/{{deliveryId}}/courier-assignment
+Content-Type: application/json
+
+{
+  "courierId": "{{courierId}}"
+}
