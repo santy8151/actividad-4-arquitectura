@@ -5,7 +5,7 @@
 - [x] Código fuente, solución, migración y configuración documentados.
 - [x] README con SDK, comandos, caso demo, endpoints, pruebas y configuración externa.
 - [ ] Clonar limpio y confirmar instrucciones en una máquina sin SDK/runtime preinstalado.
-- [ ] CI de GitHub Actions en verde (incluye unitarias, integración y revisión de paquetes).
+- [x] CI de GitHub Actions en verde (3 unitarias, 2 integración, build, migración y NuGet audit).
 
 ## Correspondencia con Actividad 3
 

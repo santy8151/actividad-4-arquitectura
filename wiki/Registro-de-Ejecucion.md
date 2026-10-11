@@ -9,7 +9,7 @@ Entorno Windows 11 local; SDK .NET 10.0.401 aislado bajo `work/` durante desarro
 | 2026-10-11 | REQ-12 | `dotnet build LastMile.sln --no-restore --configuration Release` | PASA, cero errores y cero advertencias; compiló API y ambos proyectos de prueba | salida local; advertencia CS0168 luego corregida |
 | 2026-10-11 | REQ-06 | `dotnet test tests/LastMile.Domain.Tests/... --no-build --configuration Release` | PASA: 3/3 | xUnit local, 45 ms |
 | 2026-10-11 | REQ-06 | `dotnet test tests/LastMile.IntegrationTests/... --no-build --configuration Release` | BLOQUEADO por Windows Application Control: `FileLoadException`, 0x800711C7 al cargar `LastMile.Application.dll` desde el host de prueba | no intentar evadir política; workflow Ubuntu de Actions preparado para correr la suite |
-| 2026-10-11 | REQ-06, REQ-09, REQ-07 | GitHub Actions | PENDIENTE de push/ejecución | `.github/workflows/ci.yml` |
+| 2026-10-11 | REQ-06, REQ-09, REQ-07 | GitHub Actions | PASÓ: run 38127080133, incluye test y audit | `.github/workflows/ci.yml` |
 
 ## Riesgos residuales / tareas
 
@@ -19,3 +19,4 @@ Entorno Windows 11 local; SDK .NET 10.0.401 aislado bajo `work/` durante desarro
 - Requerir reserva atómica de capacidad y authn/authz antes de producción.
 | 2026-10-11 | REQ-04, REQ-06 | GitHub Actions run 38126736237 | Fitness function, restore, build pasan; integración falla por snapshot EF Core con diferencias pendientes detectadas en `MigrateAsync()` | corregido en commit siguiente añadiendo conversión enum y generación de claves al snapshot; repetir CI antes de dar por aprobado |
 | 2026-10-11 | REQ-04, REQ-06 | GitHub Actions run 38126982717 / artifact generado con `dotnet ef migrations add SnapshotDiagnostic` | Confirma discrepancia: conversión enum/model snapshot en tipo proveedor y nombre index SQLite truncado; generado movimiento del índice. | Snapshot regenerado desde EF y nombre inicial ajustado al índice SQLite `...NextAttempt~`; CI ahora verifica `has-pending-model-changes` antes de pruebas. Resultado pendiente. |
+| 2026-10-11 | REQ-04, REQ-06, REQ-07, REQ-09, REQ-12 | GitHub Actions run 38127080133 | PASA: arquitectura, restore, build Release, `dotnet ef migrations has-pending-model-changes`, 5/5 pruebas, análisis NuGet sin vulnerabilidades conocidas | [Run CI](https://github.com/santy8151/actividad-4-arquitectura/actions/runs/38127080133); 3 unitarias + 2 integración. El resultado alojado supera el bloqueo local App Control. |

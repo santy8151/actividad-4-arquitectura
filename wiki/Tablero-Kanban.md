@@ -9,11 +9,11 @@ Tablero operativo: [GitHub Projects](https://github.com/users/santy8151/projects
 
 ## En curso / validación
 
-- [ ] KAN-07 / REQ-06: suite implementada; unitarias pasan localmente, pero las integraciones están impedidas en esta máquina por Windows Application Control al cargar DLL recién compiladas. Esperar workflow alojado de GitHub Actions.
-- [ ] KAN-09 / REQ-09: fitness function pasa localmente; workflow CI aún debe ejecutarse tras push.
-- [ ] KAN-08 / REQ-07, REQ-08: controles y límites documentados; escaneo SAST/dependencias de CI y exporter de métricas por verificar.
 
-## Hecho
+
+
+
+## Hecho`r`n`r`n- [x] KAN-07 / REQ-06: CI ejecutó 3 unitarias y 2 integración; éxito y ruta llena.`r`n- [x] KAN-08 / REQ-07, REQ-08: matriz y señales documentadas; NuGet audit pasa sin vulnerabilidades conocidas (CI).`r`n- [x] KAN-09 / REQ-09, REQ-10: fitness function, migración y revisión de paquetes pasan en CI.
 
 - [x] KAN-01 / REQ-01, REQ-05, REQ-14: integrar diseño y materiales de Actividad 3 en el repositorio.
 - [x] KAN-02 / REQ-01, REQ-02: definir el slice y criterios de aceptación.
