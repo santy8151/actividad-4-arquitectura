@@ -3,14 +3,14 @@
 | REQ | Exigencia | Actividad 3 de origen | Implementación | Verificación/evidencia | Estado |
 |---|---|---|---|---|---|
 | REQ-01 | Vertical slice funcional | `AssignCourierUseCase`, asignar mensajero | `Program.cs`, `AssignCourierUseCase`, `Delivery` | Integración `AssignCourier_HappyPath_PersistsDeliveryAndOutboxEvent` | Implementado; CI verificado (run 38127080133) |
-| REQ-02 | Capas y contratos | ADR-001/prototipo de A3 | Domain; Application ports; Infrastructure adapters | Fitness function arquitectónica | Verificado local |
+| REQ-02 | Capas y contratos | ADR-001/prototipo de A3 | Domain; Application ports; Infrastructure adapters | Fitness function arquitectónica | CI verificado (run 38127580125) |
 | REQ-03 | Integraciones y errores controlados | disponibilidad, capacidad y evento | HTTP/demo adapters, reintentos, outbox | Error por ruta llena; 503 integración caída | Implementado |
 | REQ-04 | Migración reproducible | persistencia entrega/evento | `20261011000000_InitialCreate`, `Database.Migrate()` | CI: migración EF pendiente=0 y SQLite en integración | Implementado |
 | REQ-05 | Trazabilidad de cambios | artefactos de A3 importados | ADR, wiki, Issues `KAN-XX` | historial Git, issues cerrados y [Kanban](https://github.com/users/santy8151/projects/12) | Verificado |
 | REQ-06 | Unitarias e integración (éxito/error) | invariantes de entrega y BDD | `DeliveryTests`, `AssignmentApiTests` | CI pasa: 3 unitarias + 2 integración | Verificado |
 | REQ-07 | Riesgos y seguridad | límites de contexto A3 | matriz de riesgos y CI | documentación y análisis NuGet CI sin vulnerabilidades conocidas | Verificado; DAST no aplica sin despliegue |
 | REQ-08 | Señales sin datos sensibles | observabilidad de asignación | logs estructurados, métricas, ActivitySource | inspección de campos; exporter pendiente | Implementado con residual |
-| REQ-09 | Fitness function | dominio como centro | `scripts/check_architecture.py` | comando pasa localmente | Verificado local |
+| REQ-09 | Fitness function | dominio como centro | `scripts/check_architecture.py` | grafo Onion exacto pasa en CI (run 38127580125) | Verificado |
 | REQ-10 | Trade-offs y riesgo residual | consulta de capacidad A3 | ADR-002 y matriz de riesgos | revisión arquitectónica | Documentado |
 | REQ-11 | Defensa de 10–15 min | flujo implementado | guion 12 min | grabación/cronómetro pendientes | En curso |
 | REQ-12 | Repositorio ejecutable | N/A | solución, README, migración y CI | Release build: 0 errores/0 advertencias | Verificado |
