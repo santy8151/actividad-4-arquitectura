@@ -37,7 +37,7 @@ public sealed class InitialCreate : Migration
             constraints: table => table.PrimaryKey("PK_outbox_messages", x => x.EventId));
 
         migrationBuilder.CreateIndex(
-            name: "IX_outbox_messages_PublishedAtUtc_DeadLetteredAtUtc_NextAttemptAtUtc",
+            name: "IX_outbox_messages_PublishedAtUtc_DeadLetteredAtUtc_NextAttempt~",
             table: "outbox_messages",
             columns: new[] { "PublishedAtUtc", "DeadLetteredAtUtc", "NextAttemptAtUtc" });
     }

@@ -22,18 +22,11 @@ jobs:
         run: dotnet restore LastMile.sln
       - name: Build
         run: dotnet build LastMile.sln --no-restore --configuration Release
+      - name: Check EF migration snapshot
+        run: |
+          dotnet tool install --tool-path "$RUNNER_TEMP/dotnet-tools" dotnet-ef --version 10.0.12
+          "$RUNNER_TEMP/dotnet-tools/dotnet-ef" migrations has-pending-model-changes --project src/LastMile.Infrastructure --startup-project src/LastMile.Api
       - name: Test
         run: dotnet test LastMile.sln --no-build --configuration Release --logger "trx;LogFileName=tests.trx"
-      - name: Diagnose EF snapshot drift
-        if: failure()
-        run: |
-          dotnet tool install --global dotnet-ef --version 10.0.12
-          dotnet ef migrations add SnapshotDiagnostic --project src/LastMile.Infrastructure --startup-project src/LastMile.Api --output-dir Persistence/Migrations
-          git diff -- src/LastMile.Infrastructure/Persistence/Migrations
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: migration-snapshot-diagnostic
-          path: src/LastMile.Infrastructure/Persistence/Migrations/
       - name: Check vulnerable dependencies
         run: dotnet list LastMile.sln package --vulnerable --include-transitive
