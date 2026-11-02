@@ -7,6 +7,13 @@
 *.db-shm
 *.db-wal
 
+# Node / Vite / Serverless build outputs
+node_modules/
+dist/
+.vercel/
+.netlify/
+coverage/
+
 # Local secrets and tooling
 .env
 .env.*

@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Estilos personalizados para marcadores HTML sobre Leaflet */
+.leaflet-container {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #0f172a;
+}
+
+.rc-custom-pin {
+  background: transparent !important;
+  border: none !important;
+}
+
+@keyframes rcPulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.45);
+    opacity: 0.25;
+  }
+}
+
+.rc-pulse-ring {
+  animation: rcPulseGlow 2.2s infinite ease-in-out;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 14px !important;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.65) !important;
+}
+
+.leaflet-popup-tip {
+  background: #0f172a !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+}

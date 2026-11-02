@@ -1,0 +1,43 @@
+{
+  "name": "rutaclara-crm-erp-lastmile",
+  "private": true,
+  "version": "1.0.0",
+  "description": "RutaClara — Plataforma empresarial CRM/ERP y Torre de Control Logística de Última Milla con Arquitectura Limpia",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "check:arch": "node scripts/check-core-architecture.mjs && python3 scripts/check_architecture.py",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@netlify/functions": "^2.8.2",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.36.4",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.469.0",
+    "netlify-identity-widget": "^1.9.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.14",
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "drizzle-kit": "^0.28.1",
+    "jsdom": "^25.0.1",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.16",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.6"
+  }
+}

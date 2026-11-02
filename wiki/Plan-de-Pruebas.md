@@ -20,3 +20,8 @@ dotnet list LastMile.sln package --vulnerable --include-transitive
 ```
 
 La suite integra HTTP TestServer con SQLite real en memoria y doubles de courier/ruta. No afirmar prueba contra proveedores externos. En esta máquina Windows, la ejecución de integración fue bloqueada por Application Control (`0x800711C7`) al cargar la DLL en WebApplicationFactory; la misma suite está incluida para runner hospedado Linux de Actions.
+
+| Dominio RutaClara (Vitest) | Máquina de estados, versiones y bitácora | `pendiente → asignado → en_ruta → entregado/fallido` + `cancelado`; bloqueo de versión incorrecta (`CONCURRENCY_CONFLICT`) | `tests/rutaclara.domain.test.ts` |
+| Dominio RutaClara (Vitest) | Reglas de domiciliario, distribuidor y RBAC | Rechazo por turno inactivo, sin cupo o GPS > 10 min; validación de segmento/etapa CRM; prohibición de auto-asignación de rol (`SELF_ROLE_ASSIGNMENT_FORBIDDEN`) | `tests/rutaclara.domain.test.ts` |
+| Aplicación / Integración RutaClara | Reserva atómica de cupo y compensación ante fallo | `AssignCourierUseCase` reserva cupo (`tryReserveSlot`) y lo libera (`releaseSlot`) si falla `updateWithVersion`; sugerencias Haversine y endpoints Serverless | `tests/rutaclara.application.test.ts` |
+| Arquitectura RutaClara + .NET | Doble fitness function | `core/domain` sin dependencias externas; `core/application` solo `core/domain`; `.NET` Onion intacto | `npm run check:arch` |

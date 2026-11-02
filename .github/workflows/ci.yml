@@ -10,23 +10,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Check architecture boundaries
-        run: python scripts/check_architecture.py
-      - name: Restore
+      - name: Install web dependencies
+        run: npm install
+      - name: Check architecture boundaries (RutaClara Core + .NET Onion)
+        run: npm run check:arch
+      - name: Run RutaClara Domain & Application tests
+        run: npm run test
+      - name: Build RutaClara Frontend & Serverless bundle
+        run: npm run build
+      - name: Restore .NET Solution
         run: dotnet restore LastMile.sln
-      - name: Build
+      - name: Build .NET Solution
         run: dotnet build LastMile.sln --no-restore --configuration Release
       - name: Check EF migration snapshot
         run: |
           dotnet tool install --tool-path "$RUNNER_TEMP/dotnet-tools" dotnet-ef --version 10.0.12
           "$RUNNER_TEMP/dotnet-tools/dotnet-ef" migrations has-pending-model-changes --project src/LastMile.Infrastructure --startup-project src/LastMile.Api
-      - name: Test
+      - name: Test .NET Solution
         run: dotnet test LastMile.sln --no-build --configuration Release --logger "trx;LogFileName=tests.trx"
       - name: Check vulnerable dependencies
         run: dotnet list LastMile.sln package --vulnerable --include-transitive

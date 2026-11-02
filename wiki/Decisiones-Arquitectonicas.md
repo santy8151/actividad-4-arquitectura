@@ -57,3 +57,20 @@ Registrar cada decisión con contexto, opciones, consecuencias y riesgo residual
 - **Consecuencias:** La estructura visible coincide con la arquitectura; la fitness function comprueba el grafo exacto de proyectos. Se conserva la presentación y el material A3 útil para trazabilidad, sin mantener un segundo código fuente.
 - **Riesgo residual:** El acceso entre anillos se controla a nivel de referencias de proyecto; ampliar en el futuro con reglas internas/analyzers si aparecen muchos módulos.
 - **Evidencia:** README, `scripts/check_architecture.py`, `.github/workflows/ci.yml` y árbol `src/`.
+
+
+### ADR-004 — Extensión RutaClara CRM/ERP con Mapa Geoespacial, Reserva Atómica de Cupo y Perfiles RBAC
+
+- **Estado:** Aceptada
+- **Fecha:** 2026-11-02
+- **Requisitos:** REQ-01..10, REQ-12, REQ-14
+- **Contexto:** ADR-002 dejó abiertos como riesgos residuales la reserva atómica de capacidad ante concurrencia (`RSK-06`), el control de identidad/roles (`RSK-10`) y la visualización operativa en mapa geoespacial para puntos de distribución (CRM/ERP), domiciliarios y pedidos en tiempo real.
+- **Opciones consideradas:** (a) Mantener únicamente la API sin interfaz ni control de acceso; (b) Construir la plataforma web **RutaClara** siguiendo la misma disciplina de Arquitectura Limpia (`core/domain` → `core/application` → `core/infrastructure` → `api/` y `src/`) coexistiendo con el vertical slice `.NET 10`.
+- **Decisión:** Implementar **RutaClara** con separación estricta de anillos verificada por `scripts/check-core-architecture.mjs`:
+  1. `core/domain`: máquina de estados del pedido (`pendiente → asignado → en_ruta → entregado | fallido`, más `cancelado`), incremento de `version` optimista, bitácora de eventos, regla de obsolescencia GPS del domiciliario (> 10 minutos), validación CRM/ERP de distribuidor (segmento y etapa comercial) y matriz de permisos RBAC (`admin`, `operador`, `distribuidor`, `domiciliario`, `pendiente`) con prohibición explícita de auto-asignación de rol.
+  2. `core/application`: `AssignCourierUseCase` reserva el cupo de forma atómica (`tryReserveSlot`) y ejecuta compensación automática (`releaseSlot`) si falla la persistencia del pedido o la bitácora, cerrando el riesgo de asignaciones simultáneas de la Actividad 3.
+  3. `db/` y `netlify/database/migrations/`: esquema Drizzle/PostgreSQL con restricción `CHECK (carga_actual >= 0 AND carga_actual <= capacidad_maxima)` y migración semilla con 6 distribuidores, 5 domiciliarios y 12 pedidos en Bogotá.
+  4. `src/` + `api/` + `netlify/functions/`: interfaz React + Leaflet + Tailwind y endpoints Serverless compatibles con Vercel y Netlify.
+- **Consecuencias y trade-offs:** Se cierran los riesgos `RSK-06` y `RSK-10` con pruebas automatizadas (13 pruebas en Vitest + 5 pruebas en xUnit .NET) y doble *fitness function* arquitectónica (`npm run check:arch`).
+- **Riesgo residual:** En despliegues serverless sin `DATABASE_URL` externa configurada, el adaptador opera sobre el almacén transaccional en memoria/localStorage con la semilla de Bogotá para garantizar disponibilidad cero-configuración en demostraciones.
+- **Evidencia/enlaces:** `core/domain/`, `core/application/assignCourierUseCase.ts`, `db/schema.ts`, `scripts/check-core-architecture.mjs`, `tests/rutaclara.domain.test.ts`, `tests/rutaclara.application.test.ts`.

@@ -1,261 +1,121 @@
-# LastMile Logistics Platform
+# RutaClara Enterprise — Plataforma CRM / ERP & Torre de Control de Última Milla
 
 [![CI](https://github.com/santy8151/actividad-4-arquitectura/actions/workflows/ci.yml/badge.svg)](https://github.com/santy8151/actividad-4-arquitectura/actions/workflows/ci.yml)
 
-Sistema de gestión logística para la asignación de mensajeros a entregas pendientes, desarrollado con una arquitectura orientada a dominio y validación de reglas de negocio. El proyecto implementa un caso de uso de asignación de courier, validación de capacidad de ruta y trazabilidad de eventos de negocio mediante una solución estructurada en capas.
+**RutaClara** es una plataforma empresarial **CRM/ERP geoespacial con mapa interactivo en tiempo real** para operar la logística de última milla en Bogotá D.C. Muestra dónde está cada **punto de distribución (distribuidor)**, dónde se encuentra cada **domiciliario** (con turno, capacidad y rastro GPS) y por dónde va cada **pedido**, aplicando control de acceso basado en roles (**RBAC**) según el perfil de cada usuario (`admin`, `operador`, `distribuidor`, `domiciliario`, `pendiente`).
 
-## 1. Descripción del problema
+El repositorio integra tanto el **núcleo y aplicación web full-stack de RutaClara** (desplegable en **Vercel** y **Netlify**) como el **vertical slice en .NET 10 (`LastMile.sln`)** de la Actividad 4, ambos verificados automáticamente mediante *fitness functions* de Arquitectura Limpia / Onion Architecture.
 
-La aplicación modela un escenario real de última milla en el cual una entrega debe ser asignada a un mensajero disponible. La decisión de asignación no es trivial: debe considerar disponibilidad del recurso, capacidad operativa y consistencia de la información que se persiste.
+---
 
-El dominio del problema incluye:
-
-- entregas pendientes;
-- mensajeros disponibles o no disponibles;
-- capacidad de ruta;
-- validación de reglas de negocio;
-- registro de eventos de asignación;
-- trazabilidad para auditoría y análisis.
-
-## 2. Objetivo del proyecto
-
-Desarrollar una solución técnica con una estructura de software clara y sostenible, donde la lógica de negocio quede aislada de la infraestructura y la capa de presentación. El sistema debe permitir:
-
-- asignar un mensajero disponible a una entrega pendiente;
-- verificar la capacidad operativa antes de confirmar la asignación;
-- persistir el resultado de la operación;
-- registrar eventos de negocio que permitan seguimiento y trazabilidad;
-- mantener la solución extensible para integración con servicios externos.
-
-## 3. Arquitectura del sistema
-
-El repositorio sigue una arquitectura limpia (Clean Architecture) y una aproximación Onion Architecture, con dependencia dirigida hacia el núcleo del dominio.
+## 1. Arquitectura Limpia y Capas del Sistema
 
 ```text
-                            ┌────────────────────────────────────────┐
-                            │           Capa externa                 │
-                            │  API + Infrastructure + Integrations   │
-                            └────────────────────────────────────────┘
-                                             │
-                                             ▼
-                            ┌────────────────────────────────────────┐
-                            │         Application Layer               │
-                            │  Casos de uso, puertos, contratos      │
-                            └────────────────────────────────────────┘
-                                             │
-                                             ▼
-                            ┌────────────────────────────────────────┐
-                            │            Domain Layer                  │
-                            │ entidades, reglas, invariantes, eventos │
-                            └────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                     CAPA EXTERNA (Presentación & API)                        │
+│  • Frontend React + Leaflet + Tailwind (src/App.tsx, RutaClaraMap.tsx)       │
+│  • Serverless API Endpoints: Vercel (api/index.ts) & Netlify (functions/)    │
+│  • API .NET 10 Minimal API (src/LastMile.Api)                                │
+└──────────────────────────────────────┬───────────────────────────────────────┘
+                                       │
+                                       ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                     CAPA DE INFRAESTRUCTURA (Adaptadores)                    │
+│  • core/infrastructure: Repositorios transaccionales, semilla Bogotá y       │
+│    conexión con Netlify Identity / Sesión RBAC.                              │
+│  • db/schema.ts + Migraciones Drizzle/PostgreSQL con restricción CHECK.      │
+│  • src/LastMile.Infrastructure: EF Core SQLite + Outbox Dispatcher.          │
+└──────────────────────────────────────┬───────────────────────────────────────┘
+                                       │
+                                       ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                       CAPA DE APLICACIÓN (Casos de Uso)                      │
+│  • core/application:                                                         │
+│    - CreateOrderUseCase (creación validando etapa comercial del nodo)        │
+│    - AssignCourierUseCase (reserva atómica de cupo + compensación ante fallo)│
+│    - ChangeOrderStatusUseCase (transición con liberación automática de cupo) │
+│    - SuggestNearbyCouriersUseCase (cálculo Haversine + elegibilidad GPS)     │
+│    - ReportGpsLocationUseCase & ToggleCourierShiftUseCase                    │
+│    - ManageDistributorsUseCase & ManageProfilesUseCase                       │
+└──────────────────────────────────────┬───────────────────────────────────────┘
+                                       │
+                                       ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                    NÚCLEO DE DOMINIO (Sin dependencias externas)             │
+│  • core/domain:                                                              │
+│    - Pedido: Máquina de estados (pendiente → asignado → en_ruta →            │
+│      entregado | fallido + cancelado), versión concurrente y bitácora.       │
+│    - Domiciliario: En turno, cupo libre y obsolescencia GPS (> 10 minutos).  │
+│    - Distribuidor: Validación de segmento y etapa comercial CRM/ERP.         │
+│    - Perfiles RBAC: admin, operador, distribuidor, domiciliario, pendiente   │
+│      (ningún usuario puede asignarse un rol a sí mismo).                     │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Principios implementados
+---
 
-- separación por capas;
-- dependencia del dominio hacia el exterior;
-- aislamiento de la lógica de negocio;
-- uso de puertos y adaptadores;
-- trazabilidad mediante eventos de dominio;
-- validación arquitectónica automatizada.
+## 2. Reglas de Dominio y Cierre de Riesgos de la Actividad 3
 
-## 4. Estructura del repositorio
+1. **Máquina de estados del pedido (`core/domain/order.ts`):**
+   - Transiciones válidas: `pendiente → asignado → en_ruta → entregado | fallido`, más `cancelado`.
+   - Cada cambio incrementa la `version` del pedido (`v1 → v2 → v3 → v4`) para detectar modificaciones simultáneas (*Optimistic Concurrency Control*) y genera un evento inmutable en la **bitácora (`bitacora_eventos`)**.
+2. **Reserva atómica de cupo y compensación (`core/application/assignCourierUseCase.ts`):**
+   - Cierra el riesgo de asignaciones concurrentes identificado en la Actividad 3: el caso de uso reserva primero el cupo del domiciliario de forma atómica (`tryReserveSlot`) y, si ocurre cualquier fallo al actualizar el pedido o registrar el evento, **libera inmediatamente el cupo (`releaseSlot`)**.
+   - Además, la tabla `domiciliarios` cuenta con la restricción SQL `CHECK (carga_actual >= 0 AND carga_actual <= capacidad_maxima)`.
+3. **Reglas del domiciliario (`core/domain/courier.ts`):**
+   - Debe estar **en turno (`enTurno = true`)**, tener **cupo libre (`cargaActual < capacidadMaxima`)** y su ubicación GPS se marca como **desactualizada después de 10 minutos (`STALE_LOCATION_THRESHOLD_MINUTES = 10`)**.
+4. **Validación CRM/ERP de distribuidores (`core/domain/distributor.ts`):**
+   - Valida segmento (`mayorista`, `minorista`, `horeca`, `ecommerce`, `institucional`) y etapa comercial (`prospecto`, `negociacion`, `activo`, `en_riesgo`, `inactivo`), permitiendo despachar pedidos únicamente a nodos habilitados.
+5. **Seguridad y Perfiles RBAC (`core/domain/profile.ts`):**
+   - Perfiles soportados: `admin`, `operador`, `distribuidor`, `domiciliario` y `pendiente` (cuentas nuevas aún no aprobadas).
+   - **Invariante de seguridad:** ningún usuario puede asignarse ni modificarse un rol a sí mismo (`SELF_ROLE_ASSIGNMENT_FORBIDDEN`).
 
-```text
-src/
-  LastMile.Domain/
-    Entidades, value objects, invariantes y eventos del dominio.
+---
 
-  LastMile.Application/
-    Casos de uso y contratos de aplicación.
+## 3. Escenario de Demostración en Bogotá D.C.
 
-  LastMile.Infrastructure/
-    Persistencia, adaptadores, EF Core, SQLite e integraciones.
+Tanto la migración `netlify/database/migrations/0001_seed_bogota_demo.sql` como el almacén transaccional precargan el escenario operativo en Bogotá:
+- **6 Puntos de Distribución (CRM/ERP):** Chapinero Alto (`DIST-BOG-01`), Paloquemao / Puente Aranda (`DIST-BOG-02`), Parque de la 93 / Usaquén (`DIST-BOG-03`), Salitre / Fontibón (`DIST-BOG-04`), Abastos Sur / Kennedy (`DIST-BOG-05`) y EcoBodega Suba (`DIST-BOG-06`).
+- **5 Domiciliarios:** Mateo Castellanos (`DOM-BOG-01`, moto), Camila Mora (`DOM-BOG-02`, bici eléctrica), Sebastián Rojas (`DOM-BOG-03`, van de carga), Brayan López (`DOM-BOG-04`, con GPS > 10 min para demostrar bloqueo por ubicación desactualizada) y Diana Pineda (`DOM-BOG-05`, fuera de turno).
+- **12 Pedidos (`RC-BOG-101` a `RC-BOG-112`):** incluyendo el ID del vertical slice (`d1000000-0000-4000-8000-000000000001`), con sus rutas geográficas origen → domiciliario → destino, versiones y bitácora de eventos.
 
-  LastMile.Api/
-    API HTTP, configuración y composición de dependencias.
+---
 
-tests/
-  LastMile.Domain.Tests/
-  LastMile.IntegrationTests/
+## 4. Verificación de Calidad, Pruebas y Arquitectura
 
-docs/
-  Documentación y diseño previo.
+### Plataforma Web RutaClara (TypeScript / React / Vite / Vitest)
 
-wiki/
-  Trazabilidad, decisiones arquitectónicas, pruebas, riesgos y defensa.
-
-scripts/
-  Validación automática de la arquitectura.
-
-.github/workflows/
-  Pipeline de CI/CD.
+```bash
+npm install
+npm run check:arch   # Verifica fronteras Clean Architecture en core/ y solución .NET
+npm run test         # Ejecuta pruebas automáticas de dominio y casos de uso (Vitest)
+npm run build        # Compila TypeScript y genera el bundle de producción en dist/
+npm run dev          # Inicia servidor de desarrollo local
 ```
 
-## 5. Capa por capa
+### Solución Backend .NET 10 (`LastMile.sln`)
 
-### 5.1 Domain
-La capa de dominio concentra la lógica del negocio y representa el modelo principal del problema.
-
-Contiene:
-
-- entidades del negocio;
-- invariantes;
-- value objects;
-- eventos de dominio;
-- reglas de asignación;
-- validación de capacidad y disponibilidad.
-
-Es la capa más estable y no debe depender de infraestructura ni de la API.
-
-### 5.2 Application
-La capa de aplicación coordina los casos de uso del sistema. Define las operaciones que pueden ser ejecutadas por la capa externa y encapsula la lógica de orquestación.
-
-Incluye:
-
-- servicios de aplicación;
-- puertos para persistencia e integración;
-- casos de uso específicos del dominio.
-
-### 5.3 Infrastructure
-La infraestructura implementa los puertos definidos en la capa de aplicación y se encarga de la persistencia y de los adaptadores externos.
-
-Incluye:
-
-- Entity Framework Core;
-- SQLite;
-- adaptadores de integración;
-- configuración de dependencias;
-- soporte a ejecuciones locales y de pruebas.
-
-### 5.4 API
-La API es la capa de entrada y salida del sistema. Expone endpoints HTTP y se encarga de:
-
-- recibir peticiones del cliente;
-- serializar y deserializar payloads;
-- invocar los casos de uso;
-- devolver respuestas del sistema.
-
-## 6. Flujos funcionales principales
-
-El caso de uso principal del proyecto es la asignación de un mensajero a una entrega pendiente.
-
-Flujo general:
-
-1. la API recibe la solicitud;
-2. se identifica la entrega a asignar;
-3. se valida la disponibilidad del mensajero;
-4. se comprueba la capacidad de ruta;
-5. se valida la regla de negocio correspondiente;
-6. se genera el evento `DeliveryAssigned`;
-7. se persiste la asignación para trazabilidad.
-
-## 7. Decisiones arquitectónicas
-
-### 7.1 Arquitectura limpia
-Se mantiene una separación clara entre negocio, aplicación, infraestructura y presentación. Esto facilita el mantenimiento, la prueba y la evolución del sistema.
-
-### 7.2 Eventos de dominio
-La emisión de eventos permite dejar registro del cambio en el estado del negocio y facilita extensiones futuras como auditoría, observabilidad o integración con sistemas externos.
-
-### 7.3 Puertos e interfaces
-La lógica de negocio no conoce detalles de persistencia ni de infraestructura. Eso reduce acoplamiento y mejora la capacidad de cambiar implementaciones sin afectar el dominio.
-
-### 7.4 Composición de dependencias
-La composición de la aplicación se realiza en la capa más externa, evitando que la lógica del dominio dependa de frameworks o detalles tecnológicos.
-
-## 8. Tecnologías utilizadas
-
-- C#
-- .NET
-- ASP.NET Core
-- EF Core
-- SQLite
-- Python (validación arquitectónica)
-- GitHub Actions
-- pruebas unitarias e integradas
-
-## 9. Verificación y calidad
-
-El proyecto incorpora validaciones automáticas para reforzar la calidad y la disciplina arquitectónica.
-
-### Verificación local
-
-```powershell
-python scripts/check_architecture.py
+```bash
+python3 scripts/check_architecture.py
 dotnet build LastMile.sln --configuration Release
 dotnet test LastMile.sln --configuration Release
 ```
 
-### Validaciones de CI
+---
 
-En GitHub Actions se revisa además:
+## 5. Despliegue en Vercel y Netlify
 
-- migraciones pendientes del modelo;
-- vulnerabilidades de dependencias;
-- integridad de la solución antes del merge.
-
-Esto refleja un enfoque de ingeniería más robusto y cercano a entornos productivos.
-
-## 10. Trazabilidad y observabilidad
-
-El proyecto presenta una visión técnica orientada a la trazabilidad del negocio. La documentación del repositorio incluye:
-
-- decisiones arquitectónicas;
-- riesgos del sistema;
-- plan de pruebas;
-- trazabilidad de ejecución;
-- documentación de defensa y entrega.
-
-Esto demuestra que el desarrollo no se limita a la lógica funcional, sino que también considera operación, análisis y evolución del sistema.
-
-## 11. Riesgos identificados
-
-El repositorio documenta algunos riesgos relevantes del dominio:
-
-- capacidad de ruta no reservada transaccionalmente;
-- posible carrera concurrente entre varias asignaciones;
-- necesidad futura de idempotencia o coordinación basada en workflows más avanzados.
-
-El reconocimiento de estos puntos es importante para mantener una visión realista del sistema y su grado de madurez.
-
-## 12. Ejecución local
-
-```powershell
-dotnet restore LastMile.sln
-dotnet run --project src/LastMile.Api
-```
-
-La primera ejecución aplica la migración de SQLite y carga el escenario demo del proyecto.
-
-### Datos ejemplo
-
-- Repartidor: `c0000000-0000-4000-8000-000000000001`
-- Entrega: `d1000000-0000-4000-8000-000000000001`
-
-### Endpoints principales
-
-- `GET /api/deliveries/{deliveryId}`
-- `GET /health`
-- `POST /api/deliveries/{deliveryId}/courier-assignment`
-
-## 13. Documentación adicional
-
-El repositorio incluye documentación técnica complementaria en la carpeta `wiki` y en `docs`, con los siguientes temas:
-
-- trazabilidad;
-- decisiones arquitectónicas;
-- pruebas;
-- riesgos y observabilidad;
-- defensa final;
-- checklist de entrega.
-
-## 14. Conclusión
-
-LastMile es un proyecto de arquitectura aplicada al dominio logístico. Su valor no radica únicamente en resolver una asignación puntual, sino en demostrar cómo estructurar una solución con un modelo de negocio claro, diseño limpio, separación de responsabilidades, trazabilidad y validación técnica.
-
-La solución refleja un enfoque disciplinado de ingeniería de software orientado a calidad, mantenibilidad y evolución del sistema.
+- **Vercel (`vercel.json` + `api/index.ts`):** Configurado automáticamente con `buildCommand: "npm run build"`, `outputDirectory: "dist"` y Serverless Functions en `/api/*` y `/health`.
+- **Netlify (`netlify.toml` + `netlify/functions/api.mts`):** Configurado con publicación en `dist`, funciones en `netlify/functions` y soporte para **Netlify Identity** + **Netlify Database (Drizzle)**.
 
 ---
 
-Proyecto académico desarrollado con enfoque en arquitectura limpia, trazabilidad, pruebas y diseño de software para un escenario realista de logística de última milla.
+## 6. Expediente Arquitectónico (Wiki & Docs)
+
+- [Wiki Principal](wiki/Home.md)
+- [Matriz de Trazabilidad](wiki/Trazabilidad.md)
+- [Decisiones Arquitectónicas (ADRs)](wiki/Decisiones-Arquitectonicas.md)
+- [Plan de Pruebas](wiki/Plan-de-Pruebas.md)
+- [Riesgos y Observabilidad](wiki/Riesgos-y-Observabilidad.md)
+- [Guion de Defensa](wiki/Guion-de-Defensa.md)
+- [Checklist de Entrega](wiki/Checklist-de-Entrega.md)
