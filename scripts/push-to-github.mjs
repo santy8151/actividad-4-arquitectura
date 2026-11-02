@@ -91,7 +91,7 @@ async function main() {
     tree: treeItems,
   });
 
-  const commitMessage =
+  const commitMessage = process.env.COMMIT_MSG ||
     'feat: complete RutaClara CRM/ERP & Last-Mile Control Tower with Clean Architecture, Leaflet map, RBAC login, and Vercel/Netlify serverless API';
 
   const newCommit = await ghApi('/git/commits', 'POST', {

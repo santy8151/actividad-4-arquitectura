@@ -49,3 +49,12 @@
 .leaflet-popup-content {
   margin: 12px 14px !important;
 }
+
+/* Mapa esquemático: funciona sin internet ni proveedor de teselas */
+.rc-schematic-bg {
+  background-color: #0b1220 !important;
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
+}

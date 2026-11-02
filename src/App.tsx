@@ -127,7 +127,7 @@ export function App() {
     gpsTrail: true,
     coverageRadius: true,
   });
-  const [tileStyle, setTileStyle] = useState<MapTileStyle>('dark');
+  const [tileStyle, setTileStyle] = useState<MapTileStyle>('osm');
   const [clickMode, setClickMode] = useState<MapClickMode>('none');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'todos'>('todos');
   const [searchQuery, setSearchQuery] = useState('');
@@ -1019,7 +1019,7 @@ export function App() {
                   </div>
 
                   <div className="flex items-center gap-1">
-                    {(['dark', 'light', 'osm'] as const).map((style) => (
+                    {(['osm', 'dark', 'light', 'schematic'] as const).map((style) => (
                       <button
                         key={style}
                         onClick={() => setTileStyle(style)}
@@ -1029,7 +1029,7 @@ export function App() {
                             : 'text-slate-400 hover:bg-slate-800'
                         }`}
                       >
-                        {style === 'dark' ? 'Oscuro' : style === 'light' ? 'Claro' : 'OSM'}
+                        {style === 'dark' ? 'Oscuro' : style === 'light' ? 'Claro' : style === 'osm' ? 'Calles' : 'Esquema'}
                       </button>
                     ))}
                   </div>
@@ -1062,6 +1062,10 @@ export function App() {
                       setInspectorTab('courier');
                     }}
                     onMapCoordinatesPick={handleMapCoordinatesPick}
+                    onTilesFailed={() => {
+                      setTileStyle('schematic');
+                      showNotification('info', 'Mapa en modo esquema', 'No se pudieron cargar las calles; se activó el mapa esquemático interactivo (funciona sin internet).');
+                    }}
                   />
                 </div>
               </div>

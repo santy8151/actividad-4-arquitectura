@@ -20,7 +20,7 @@ import {
 } from '@core/domain';
 
 export type MapClickMode = 'none' | 'report_gps' | 'pick_destination';
-export type MapTileStyle = 'dark' | 'light' | 'osm';
+export type MapTileStyle = 'dark' | 'light' | 'osm' | 'schematic';
 
 export interface MapLayerVisibility {
   distributors: boolean;
@@ -47,6 +47,7 @@ interface RutaClaraMapProps {
   onSelectDistributor: (distributorId: string) => void;
   onSelectCourier: (courierId: string) => void;
   onMapCoordinatesPick?: (lat: number, lng: number) => void;
+  onTilesFailed?: () => void;
 }
 
 function MapViewportController({ focusCoords }: { focusCoords: [number, number] | null }) {
@@ -180,7 +181,7 @@ function createOrderIcon(order: Order, isSelected: boolean): L.DivIcon {
   });
 }
 
-const TILE_URLS: Record<MapTileStyle, { url: string; attribution: string }> = {
+const TILE_URLS: Record<Exclude<MapTileStyle, 'schematic'>, { url: string; attribution: string }> = {
   dark: {
     url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
     attribution: '&copy; OpenStreetMap &copy; CARTO',
@@ -211,9 +212,11 @@ export function RutaClaraMap({
   onSelectDistributor,
   onSelectCourier,
   onMapCoordinatesPick,
+  onTilesFailed,
 }: RutaClaraMapProps) {
   const bogotaCenter: [number, number] = [4.653, -74.083];
-  const tileConfig = TILE_URLS[tileStyle];
+  const tileConfig = tileStyle === 'schematic' ? null : TILE_URLS[tileStyle];
+  let tileErrors = 0;
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-2xl border border-slate-800/80 shadow-2xl">
@@ -229,9 +232,20 @@ export function RutaClaraMap({
         center={bogotaCenter}
         zoom={12}
         scrollWheelZoom={true}
-        className="h-full w-full z-0"
+        className={`h-full w-full z-0 ${tileStyle === 'schematic' ? 'rc-schematic-bg' : ''}`}
       >
-        <TileLayer attribution={tileConfig.attribution} url={tileConfig.url} />
+        {tileConfig && (
+          <TileLayer
+            attribution={tileConfig.attribution}
+            url={tileConfig.url}
+            eventHandlers={{
+              tileerror: () => {
+                tileErrors += 1;
+                if (tileErrors === 4) onTilesFailed?.();
+              },
+            }}
+          />
+        )}
         <MapViewportController focusCoords={focusCoords} />
         <MapClickHandler clickMode={clickMode} onPick={onMapCoordinatesPick} />
 
