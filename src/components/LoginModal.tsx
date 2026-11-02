@@ -28,7 +28,6 @@ interface LoginModalProps {
     cargo: string;
     distribuidorId?: string;
   }) => Promise<void>;
-  onOpenNetlifyIdentity: () => void;
 }
 
 const ROLE_META: Record<
@@ -80,7 +79,6 @@ export function LoginModal({
   activeProfile,
   onSelectProfile,
   onRegisterPendingUser,
-  onOpenNetlifyIdentity,
 }: LoginModalProps) {
   const [tab, setTab] = useState<'profiles' | 'register'>('profiles');
   const [nombre, setNombre] = useState('');
@@ -118,7 +116,7 @@ export function LoginModal({
                 Centro de Identidad y Acceso Multi-Perfil — RutaClara
               </h2>
               <p className="text-xs text-slate-400">
-                Selecciona cualquier perfil para operar la plataforma según sus reglas de dominio RBAC o autentícate con Netlify Identity.
+                Selecciona cualquier perfil para operar la plataforma según sus reglas de dominio RBAC.
               </p>
             </div>
           </div>
@@ -157,13 +155,6 @@ export function LoginModal({
             </button>
           </div>
 
-          <button
-            onClick={onOpenNetlifyIdentity}
-            className="flex items-center gap-1.5 rounded-xl border border-teal-500/40 bg-teal-500/10 px-3.5 py-2 text-xs font-semibold text-teal-300 hover:bg-teal-500/20"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Abrir Widget Netlify Identity
-          </button>
         </div>
 
         {/* Body */}

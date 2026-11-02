@@ -126,7 +126,7 @@ describe('RutaClara Application Use Cases (core/application)', () => {
 
 import { handleRutaClaraApiRequest } from '../core/infrastructure/httpApiHandler';
 
-describe('RutaClara Serverless API Handler (Vercel & Netlify Functions)', () => {
+describe('RutaClara Serverless API Handler (Vercel)', () => {
   it('responde health check y expone el vertical slice /api/deliveries/:id', async () => {
     const health = await handleRutaClaraApiRequest({
       method: 'GET',

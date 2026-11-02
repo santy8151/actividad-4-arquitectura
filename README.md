@@ -4,7 +4,7 @@
 
 **RutaClara** es una plataforma empresarial **CRM/ERP geoespacial con mapa interactivo en tiempo real** para operar la logística de última milla en Bogotá D.C. Muestra dónde está cada **punto de distribución (distribuidor)**, dónde se encuentra cada **domiciliario** (con turno, capacidad y rastro GPS) y por dónde va cada **pedido**, aplicando control de acceso basado en roles (**RBAC**) según el perfil de cada usuario (`admin`, `operador`, `distribuidor`, `domiciliario`, `pendiente`).
 
-El repositorio integra tanto el **núcleo y aplicación web full-stack de RutaClara** (desplegable en **Vercel** y **Netlify**) como el **vertical slice en .NET 10 (`LastMile.sln`)** de la Actividad 4, ambos verificados automáticamente mediante *fitness functions* de Arquitectura Limpia / Onion Architecture.
+El repositorio integra tanto el **núcleo y aplicación web full-stack de RutaClara** (desplegable en **Vercel**) como el **vertical slice en .NET 10 (`LastMile.sln`)** de la Actividad 4, ambos verificados automáticamente mediante *fitness functions* de Arquitectura Limpia / Onion Architecture.
 
 ---
 
@@ -14,7 +14,7 @@ El repositorio integra tanto el **núcleo y aplicación web full-stack de RutaCl
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │                     CAPA EXTERNA (Presentación & API)                        │
 │  • Frontend React + Leaflet + Tailwind (src/App.tsx, RutaClaraMap.tsx)       │
-│  • Serverless API Endpoints: Vercel (api/index.ts) & Netlify (functions/)    │
+│  • Serverless API Endpoints: Vercel (api/index.ts)                          │
 │  • API .NET 10 Minimal API (src/LastMile.Api)                                │
 └──────────────────────────────────────┬───────────────────────────────────────┘
                                        │
@@ -22,7 +22,7 @@ El repositorio integra tanto el **núcleo y aplicación web full-stack de RutaCl
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │                     CAPA DE INFRAESTRUCTURA (Adaptadores)                    │
 │  • core/infrastructure: Repositorios transaccionales, semilla Bogotá y       │
-│    conexión con Netlify Identity / Sesión RBAC.                              │
+│    sesión RBAC por perfil.                                      │
 │  • db/schema.ts + Migraciones Drizzle/PostgreSQL con restricción CHECK.      │
 │  • src/LastMile.Infrastructure: EF Core SQLite + Outbox Dispatcher.          │
 └──────────────────────────────────────┬───────────────────────────────────────┘
@@ -74,7 +74,7 @@ El repositorio integra tanto el **núcleo y aplicación web full-stack de RutaCl
 
 ## 3. Escenario de Demostración en Bogotá D.C.
 
-Tanto la migración `netlify/database/migrations/0001_seed_bogota_demo.sql` como el almacén transaccional precargan el escenario operativo en Bogotá:
+Tanto la migración `db/migrations/0001_seed_bogota_demo.sql` como el almacén transaccional precargan el escenario operativo en Bogotá:
 - **6 Puntos de Distribución (CRM/ERP):** Chapinero Alto (`DIST-BOG-01`), Paloquemao / Puente Aranda (`DIST-BOG-02`), Parque de la 93 / Usaquén (`DIST-BOG-03`), Salitre / Fontibón (`DIST-BOG-04`), Abastos Sur / Kennedy (`DIST-BOG-05`) y EcoBodega Suba (`DIST-BOG-06`).
 - **5 Domiciliarios:** Mateo Castellanos (`DOM-BOG-01`, moto), Camila Mora (`DOM-BOG-02`, bici eléctrica), Sebastián Rojas (`DOM-BOG-03`, van de carga), Brayan López (`DOM-BOG-04`, con GPS > 10 min para demostrar bloqueo por ubicación desactualizada) y Diana Pineda (`DOM-BOG-05`, fuera de turno).
 - **12 Pedidos (`RC-BOG-101` a `RC-BOG-112`):** incluyendo el ID del vertical slice (`d1000000-0000-4000-8000-000000000001`), con sus rutas geográficas origen → domiciliario → destino, versiones y bitácora de eventos.
@@ -103,10 +103,9 @@ dotnet test LastMile.sln --configuration Release
 
 ---
 
-## 5. Despliegue en Vercel y Netlify
+## 5. Despliegue en Vercel
 
 - **Vercel (`vercel.json` + `api/index.ts`):** Configurado automáticamente con `buildCommand: "npm run build"`, `outputDirectory: "dist"` y Serverless Functions en `/api/*` y `/health`.
-- **Netlify (`netlify.toml` + `netlify/functions/api.mts`):** Configurado con publicación en `dist`, funciones en `netlify/functions` y soporte para **Netlify Identity** + **Netlify Database (Drizzle)**.
 
 ---
 

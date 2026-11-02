@@ -197,21 +197,6 @@ export function App() {
     setSnapshot(runtime.store.getSnapshot());
   }
 
-  // Inicializar adaptador de Netlify Identity
-  useEffect(() => {
-    identityAdapter.init((email) => {
-      if (!email) return;
-      const currentSnap = runtime.store.getSnapshot();
-      const matched = currentSnap.profiles.find(
-        (p) => p.email.toLowerCase() === email.toLowerCase()
-      );
-      if (matched) {
-        setActiveProfileId(matched.id);
-        identityAdapter.saveSessionProfileId(matched.id);
-      }
-    });
-  }, [runtime]);
-
   // Recalcular sugerencias de domiciliarios cuando cambia el pedido seleccionado
   useEffect(() => {
     if (!selectedOrderId) {
@@ -2048,7 +2033,6 @@ export function App() {
         activeProfile={activeProfile}
         onSelectProfile={handleSwitchProfile}
         onRegisterPendingUser={handleRegisterPendingUser}
-        onOpenNetlifyIdentity={() => identityAdapter.openModal('login')}
       />
 
       {/* MODAL DE CREACIÓN DE NUEVO PEDIDO */}

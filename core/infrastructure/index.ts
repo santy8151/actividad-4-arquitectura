@@ -63,4 +63,4 @@ export function buildRutaClaraUseCases(store: TransactionalRutaClaraStore = defa
 
 export * from './bogotaDemoSeed';
 export * from './repositories';
-export * from './netlifyIdentityService';
+export * from './sessionService';

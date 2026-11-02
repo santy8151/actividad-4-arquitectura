@@ -47,7 +47,6 @@ export async function handleRutaClaraApiRequest(
 ): Promise<UniversalHttpResponse> {
   const method = req.method.toUpperCase();
   const cleanPath = req.path
-    .replace(/^\/\.netlify\/functions\/api/, '')
     .replace(/\?.*$/, '')
     .replace(/\/+$/, '') || '/';
 

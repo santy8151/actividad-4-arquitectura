@@ -20,7 +20,6 @@ const IGNORED_DIRS = new Set([
   'dist',
   '.git',
   '.vercel',
-  '.netlify',
   'bin',
   'obj',
   '__pycache__',
@@ -86,13 +85,25 @@ async function main() {
     });
   }
 
+  // Elimina del repo remoto los archivos que ya no existen localmente (solo rutas gestionadas por este proyecto)
+  const managedRoots = ['api/', 'core/', 'db/', 'src/', 'netlify/', 'scripts/', 'tests/', 'wiki/'];
+  const managedFiles = new Set(['netlify.toml']);
+  const localPaths = new Set(treeItems.map((t) => t.path));
+  const remoteTree = await ghApi(`/git/trees/${baseTreeSha}?recursive=1`);
+  for (const node of remoteTree.tree) {
+    if (node.type !== 'blob' || localPaths.has(node.path)) continue;
+    if (managedFiles.has(node.path) || managedRoots.some((r) => node.path.startsWith(r))) {
+      treeItems.push({ path: node.path, mode: '100644', type: 'blob', sha: null });
+    }
+  }
+
   const newTree = await ghApi('/git/trees', 'POST', {
     base_tree: baseTreeSha,
     tree: treeItems,
   });
 
   const commitMessage = process.env.COMMIT_MSG ||
-    'feat: complete RutaClara CRM/ERP & Last-Mile Control Tower with Clean Architecture, Leaflet map, RBAC login, and Vercel/Netlify serverless API';
+    'feat: complete RutaClara CRM/ERP & Last-Mile Control Tower with Clean Architecture, Leaflet map, RBAC login, and Vercel serverless API';
 
   const newCommit = await ghApi('/git/commits', 'POST', {
     message: commitMessage,
@@ -106,7 +117,7 @@ async function main() {
   });
 
   console.log(`✅ Commit publicado exitosamente en ${REPO_OWNER}/${REPO_NAME}@${BRANCH}: ${newCommit.sha}`);
-  console.log(`🌐 Esto dispara automáticamente el despliegue en Vercel y Netlify.`);
+  console.log(`🌐 Esto dispara automáticamente el despliegue en Vercel.`);
 }
 
 main().catch((err) => {

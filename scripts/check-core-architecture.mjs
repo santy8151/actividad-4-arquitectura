@@ -38,8 +38,6 @@ const forbiddenInDomain = [
   'application',
   'infrastructure',
   'drizzle-orm',
-  '@netlify',
-  'netlify-identity-widget',
   'react',
   'leaflet',
   '../',
@@ -67,8 +65,6 @@ const appFiles = listTsFiles(path.join(rootDir, 'core/application'));
 const forbiddenInApplication = [
   'infrastructure',
   'drizzle-orm',
-  '@netlify',
-  'netlify-identity-widget',
   'react',
   'leaflet',
   '@db',

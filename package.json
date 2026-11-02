@@ -2,7 +2,7 @@
   "name": "rutaclara-crm-erp-lastmile",
   "private": true,
   "version": "1.0.0",
-  "description": "RutaClara — Plataforma empresarial CRM/ERP y Torre de Control Logística de Última Milla con Arquitectura Limpia",
+  "description": "RutaClara \u2014 Plataforma empresarial CRM/ERP y Torre de Control Log\u00edstica de \u00daltima Milla con Arquitectura Limpia",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,12 +15,10 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
-    "@netlify/functions": "^2.8.2",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.36.4",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.469.0",
-    "netlify-identity-widget": "^1.9.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-leaflet": "^4.2.1"
