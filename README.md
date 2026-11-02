@@ -2,101 +2,184 @@
 
 [![CI](https://github.com/santy8151/actividad-4-arquitectura/actions/workflows/ci.yml/badge.svg)](https://github.com/santy8151/actividad-4-arquitectura/actions/workflows/ci.yml)
 
-Plataforma de gestión logística para la asignación de mensajeros a entregas pendientes, con validación de capacidad de ruta y trazabilidad de eventos de negocio. Este repositorio presenta una solución orientada a producto y preparada para escenarios de operación real, con arquitectura limpia, automatización, pruebas y gobernanza técnica.
+Sistema de gestión logística para la asignación de mensajeros a entregas pendientes, desarrollado con una arquitectura orientada a dominio y validación de reglas de negocio. El proyecto implementa un caso de uso de asignación de courier, validación de capacidad de ruta y trazabilidad de eventos de negocio mediante una solución estructurada en capas.
 
-## Visión empresarial
+## 1. Descripción del problema
 
-LastMile está diseñado para apoyar una operación de reparto urbano eficiente y confiable. El sistema permite:
+La aplicación modela un escenario real de última milla en el cual una entrega debe ser asignada a un mensajero disponible. La decisión de asignación no es trivial: debe considerar disponibilidad del recurso, capacidad operativa y consistencia de la información que se persiste.
 
-- asignar automáticamente un mensajero disponible a una entrega pendiente;
-- validar la capacidad de la ruta antes de confirmar la asignación;
-- registrar eventos de dominio para auditoría y trazabilidad;
-- ofrecer una base tecnológica lista para evolución hacia integración con sistemas externos reales;
-- mantener un nivel de calidad y observabilidad adecuado para entornos de producción.
+El dominio del problema incluye:
 
-La solución se estructura como un producto interno de empresa logística, con una arquitectura que separa claramente negocio, aplicación, infraestructura e interfaces.
+- entregas pendientes;
+- mensajeros disponibles o no disponibles;
+- capacidad de ruta;
+- validación de reglas de negocio;
+- registro de eventos de asignación;
+- trazabilidad para auditoría y análisis.
 
-## Arquitectura
+## 2. Objetivo del proyecto
 
-La dependencia siempre apunta hacia el dominio. Infraestructura implementa puertos de aplicación; la API compone los adaptadores al iniciar la solución.
+Desarrollar una solución técnica con una estructura de software clara y sostenible, donde la lógica de negocio quede aislada de la infraestructura y la capa de presentación. El sistema debe permitir:
+
+- asignar un mensajero disponible a una entrega pendiente;
+- verificar la capacidad operativa antes de confirmar la asignación;
+- persistir el resultado de la operación;
+- registrar eventos de negocio que permitan seguimiento y trazabilidad;
+- mantener la solución extensible para integración con servicios externos.
+
+## 3. Arquitectura del sistema
+
+El repositorio sigue una arquitectura limpia (Clean Architecture) y una aproximación Onion Architecture, con dependencia dirigida hacia el núcleo del dominio.
 
 ```text
-                    ┌──────────────────────────────────────┐
-                    │ Exterior: API + Infrastructure         │
-                    │ depende hacia el núcleo               │
-                    │   ┌───────────────────────────────┐   │
-                    │   │ Application                   │   │
-                    │   │ casos de uso + puertos        │   │
-                    │   │   ┌───────────────────────┐   │   │
-                    │   │   │ Domain                │   │   │
-                    │   │   │ reglas / eventos      │   │   │
-                    │   │   └───────────────────────┘   │   │
-                    │   └───────────────────────────────┘   │
-                    └──────────────────────────────────────┘
+                            ┌────────────────────────────────────────┐
+                            │           Capa externa                 │
+                            │  API + Infrastructure + Integrations   │
+                            └────────────────────────────────────────┘
+                                             │
+                                             ▼
+                            ┌────────────────────────────────────────┐
+                            │         Application Layer               │
+                            │  Casos de uso, puertos, contratos      │
+                            └────────────────────────────────────────┘
+                                             │
+                                             ▼
+                            ┌────────────────────────────────────────┐
+                            │            Domain Layer                  │
+                            │ entidades, reglas, invariantes, eventos │
+                            └────────────────────────────────────────┘
 ```
 
-### Capas del sistema
+### Principios implementados
 
-- `LastMile.Domain`: entidades, invariantes, value objects, eventos de dominio y reglas de negocio.
-- `LastMile.Application`: casos de uso y contratos de integración.
-- `LastMile.Infrastructure`: persistencia, adaptadores y servicios externos.
-- `LastMile.Api`: capa HTTP, endpoints y composición de dependencias.
+- separación por capas;
+- dependencia del dominio hacia el exterior;
+- aislamiento de la lógica de negocio;
+- uso de puertos y adaptadores;
+- trazabilidad mediante eventos de dominio;
+- validación arquitectónica automatizada.
 
-La regla arquitectónica se valida con `python scripts/check_architecture.py` y se integra en CI.
+## 4. Estructura del repositorio
 
-## Modelo de negocio
+```text
+src/
+  LastMile.Domain/
+    Entidades, value objects, invariantes y eventos del dominio.
 
-El caso de uso central es la asignación de mensajero a entrega:
+  LastMile.Application/
+    Casos de uso y contratos de aplicación.
 
-1. se identifica una entrega pendiente;
-2. se consulta la disponibilidad del mensajero;
-3. se valida la capacidad de ruta y la factibilidad operativa;
-4. se registra el evento `DeliveryAssigned`;
-5. se persiste la información para trazabilidad y análisis posterior.
+  LastMile.Infrastructure/
+    Persistencia, adaptadores, EF Core, SQLite e integraciones.
 
-Esto permite que el sistema actúe como un componente operativo dentro de una cadena de logística de última milla, con principios de consistencia, auditabilidad y extensibilidad.
+  LastMile.Api/
+    API HTTP, configuración y composición de dependencias.
 
-## Navegación del proyecto
+tests/
+  LastMile.Domain.Tests/
+  LastMile.IntegrationTests/
 
-- [Tablero Kanban](https://github.com/users/santy8151/projects/12)
-- [Wiki y trazabilidad](wiki/Home.md)
-- [Diseño de actividad 3](docs/actividad-3.md)
-- [ADRs](wiki/Decisiones-Arquitectonicas.md)
-- [Plan de pruebas](wiki/Plan-de-Pruebas.md)
-- [Riesgos y observabilidad](wiki/Riesgos-y-Observabilidad.md)
-- [Guion de defensa](wiki/Guion-de-Defensa.md)
-- [Checklist de entrega](wiki/Checklist-de-Entrega.md)
+docs/
+  Documentación y diseño previo.
 
-## Requisitos
+wiki/
+  Trazabilidad, decisiones arquitectónicas, pruebas, riesgos y defensa.
 
-- .NET SDK 10.0.x
-- Python 3
-- SQLite para la ejecución local
+scripts/
+  Validación automática de la arquitectura.
 
-## Ejecución local
-
-```powershell
-dotnet restore LastMile.sln
-dotnet run --project src/LastMile.Api
+.github/workflows/
+  Pipeline de CI/CD.
 ```
 
-La primera ejecución aplica la migración de SQLite y agrega la entrega demo. El repartidor demo es:
+## 5. Capa por capa
 
-- `c0000000-0000-4000-8000-000000000001`
+### 5.1 Domain
+La capa de dominio concentra la lógica del negocio y representa el modelo principal del problema.
 
-La entrega demo es:
+Contiene:
 
-- `d1000000-0000-4000-8000-000000000001`
+- entidades del negocio;
+- invariantes;
+- value objects;
+- eventos de dominio;
+- reglas de asignación;
+- validación de capacidad y disponibilidad.
 
-### Endpoints principales
+Es la capa más estable y no debe depender de infraestructura ni de la API.
 
-- `GET /api/deliveries/{deliveryId}`
-- `GET /health`
-- `POST /api/deliveries/{deliveryId}/courier-assignment`
+### 5.2 Application
+La capa de aplicación coordina los casos de uso del sistema. Define las operaciones que pueden ser ejecutadas por la capa externa y encapsula la lógica de orquestación.
 
-La entrega solo puede asignarse una vez. En caso de reinicio de datos, se recomienda eliminar `lastmile.db` antes de realizar una nueva ejecución de demostración.
+Incluye:
 
-## Verificación de calidad
+- servicios de aplicación;
+- puertos para persistencia e integración;
+- casos de uso específicos del dominio.
+
+### 5.3 Infrastructure
+La infraestructura implementa los puertos definidos en la capa de aplicación y se encarga de la persistencia y de los adaptadores externos.
+
+Incluye:
+
+- Entity Framework Core;
+- SQLite;
+- adaptadores de integración;
+- configuración de dependencias;
+- soporte a ejecuciones locales y de pruebas.
+
+### 5.4 API
+La API es la capa de entrada y salida del sistema. Expone endpoints HTTP y se encarga de:
+
+- recibir peticiones del cliente;
+- serializar y deserializar payloads;
+- invocar los casos de uso;
+- devolver respuestas del sistema.
+
+## 6. Flujos funcionales principales
+
+El caso de uso principal del proyecto es la asignación de un mensajero a una entrega pendiente.
+
+Flujo general:
+
+1. la API recibe la solicitud;
+2. se identifica la entrega a asignar;
+3. se valida la disponibilidad del mensajero;
+4. se comprueba la capacidad de ruta;
+5. se valida la regla de negocio correspondiente;
+6. se genera el evento `DeliveryAssigned`;
+7. se persiste la asignación para trazabilidad.
+
+## 7. Decisiones arquitectónicas
+
+### 7.1 Arquitectura limpia
+Se mantiene una separación clara entre negocio, aplicación, infraestructura y presentación. Esto facilita el mantenimiento, la prueba y la evolución del sistema.
+
+### 7.2 Eventos de dominio
+La emisión de eventos permite dejar registro del cambio en el estado del negocio y facilita extensiones futuras como auditoría, observabilidad o integración con sistemas externos.
+
+### 7.3 Puertos e interfaces
+La lógica de negocio no conoce detalles de persistencia ni de infraestructura. Eso reduce acoplamiento y mejora la capacidad de cambiar implementaciones sin afectar el dominio.
+
+### 7.4 Composición de dependencias
+La composición de la aplicación se realiza en la capa más externa, evitando que la lógica del dominio dependa de frameworks o detalles tecnológicos.
+
+## 8. Tecnologías utilizadas
+
+- C#
+- .NET
+- ASP.NET Core
+- EF Core
+- SQLite
+- Python (validación arquitectónica)
+- GitHub Actions
+- pruebas unitarias e integradas
+
+## 9. Verificación y calidad
+
+El proyecto incorpora validaciones automáticas para reforzar la calidad y la disciplina arquitectónica.
+
+### Verificación local
 
 ```powershell
 python scripts/check_architecture.py
@@ -104,63 +187,75 @@ dotnet build LastMile.sln --configuration Release
 dotnet test LastMile.sln --configuration Release
 ```
 
-El pipeline de CI incluye validaciones adicionales sobre arquitectura, migraciones y dependencias vulnerables:
+### Validaciones de CI
 
-- `dotnet ef migrations has-pending-model-changes`
-- `dotnet list package --vulnerable --include-transitive`
+En GitHub Actions se revisa además:
 
-## Estructura del repositorio
+- migraciones pendientes del modelo;
+- vulnerabilidades de dependencias;
+- integridad de la solución antes del merge.
 
-```text
-src/
-  LastMile.Domain/          # Centro del dominio y reglas de negocio
-  LastMile.Application/     # Casos de uso y puertos
-  LastMile.Infrastructure/  # Persistencia e integraciones
-  LastMile.Api/             # API HTTP y composition root
+Esto refleja un enfoque de ingeniería más robusto y cercano a entornos productivos.
 
-tests/
-  LastMile.Domain.Tests/
-  LastMile.IntegrationTests/
+## 10. Trazabilidad y observabilidad
 
-docs/                      # Diseño de la actividad y ADR original
-docs/actividad-3.md
-wiki/                      # Trazabilidad, decisiones, riesgos y defensa
-scripts/                   # Validación arquitectónica
-.github/workflows/         # Pipeline CI/CD
+El proyecto presenta una visión técnica orientada a la trazabilidad del negocio. La documentación del repositorio incluye:
+
+- decisiones arquitectónicas;
+- riesgos del sistema;
+- plan de pruebas;
+- trazabilidad de ejecución;
+- documentación de defensa y entrega.
+
+Esto demuestra que el desarrollo no se limita a la lógica funcional, sino que también considera operación, análisis y evolución del sistema.
+
+## 11. Riesgos identificados
+
+El repositorio documenta algunos riesgos relevantes del dominio:
+
+- capacidad de ruta no reservada transaccionalmente;
+- posible carrera concurrente entre varias asignaciones;
+- necesidad futura de idempotencia o coordinación basada en workflows más avanzados.
+
+El reconocimiento de estos puntos es importante para mantener una visión realista del sistema y su grado de madurez.
+
+## 12. Ejecución local
+
+```powershell
+dotnet restore LastMile.sln
+dotnet run --project src/LastMile.Api
 ```
 
-## Calidad, observabilidad y riesgos
+La primera ejecución aplica la migración de SQLite y carga el escenario demo del proyecto.
 
-La solución incorpora criterios de operación empresarial:
+### Datos ejemplo
 
-- trazabilidad de eventos de negocio;
-- separación clara entre capas y responsabilidades;
-- validación automática de integridad arquitectónica;
-- pruebas de dominio e integración;
-- preparación para observabilidad y comportamiento en entorno real.
+- Repartidor: `c0000000-0000-4000-8000-000000000001`
+- Entrega: `d1000000-0000-4000-8000-000000000001`
 
-### Riesgos identificados
+### Endpoints principales
 
-- la capacidad se consulta y no se reserva de forma transaccional;
-- falta una reserva idempotente o saga para controlar carreras concurrentes;
-- la API aún presenta un nivel de simplicidad adecuado para demostración y evolución.
+- `GET /api/deliveries/{deliveryId}`
+- `GET /health`
+- `POST /api/deliveries/{deliveryId}/courier-assignment`
 
-Estos puntos se documentan en la wiki para mantener una visión realista del producto y su madurez operativa.
+## 13. Documentación adicional
 
-## Roadmap
+El repositorio incluye documentación técnica complementaria en la carpeta `wiki` y en `docs`, con los siguientes temas:
 
-El proyecto está preparado para avanzar hacia una versión más empresarial mediante:
+- trazabilidad;
+- decisiones arquitectónicas;
+- pruebas;
+- riesgos y observabilidad;
+- defensa final;
+- checklist de entrega.
 
-- reservas transaccionales y manejo de concurrencia;
-- integración con sistemas reales de gestión de couriers y rutas;
-- observabilidad avanzada con métricas, logs estructurados y alertas;
-- seguridad y control de acceso;
-- despliegue automatizado en entornos de calidad y producción.
+## 14. Conclusión
 
-## Conclusión
+LastMile es un proyecto de arquitectura aplicada al dominio logístico. Su valor no radica únicamente en resolver una asignación puntual, sino en demostrar cómo estructurar una solución con un modelo de negocio claro, diseño limpio, separación de responsabilidades, trazabilidad y validación técnica.
 
-LastMile no es solo un ejercicio académico: representa un enfoque de arquitectura empresarial para resolver un problema real de logística de última milla con rigor técnico, trazabilidad y escalabilidad. La estructura del repositorio, la organización por capas, la automatización y la documentación evidencian una solución preparada para un contexto corporativo.
+La solución refleja un enfoque disciplinado de ingeniería de software orientado a calidad, mantenibilidad y evolución del sistema.
 
 ---
 
-Proyecto académico desarrollado como una propuesta de arquitectura limpia, trazabilidad, pruebas y operación realista para una empresa de logística.
+Proyecto académico desarrollado con enfoque en arquitectura limpia, trazabilidad, pruebas y diseño de software para un escenario realista de logística de última milla.
